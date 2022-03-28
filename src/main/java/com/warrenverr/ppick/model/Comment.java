@@ -30,7 +30,4 @@ public class Comment {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<ReComment> reCommentList;
 
-    private int num;
-    public void test() {}
-
 }
