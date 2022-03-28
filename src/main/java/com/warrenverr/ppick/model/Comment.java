@@ -31,4 +31,6 @@ public class Comment {
     private List<ReComment> reCommentList;
 
     private int num;
+    public void test() {}
+
 }
