@@ -57,4 +57,6 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Comment> commentList;
+
+    private String test;
 }
