@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Project {
 
