@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -40,7 +41,7 @@ public class User {
     private String detail_category;
 
     @CreatedDate
-    private String date;
+    private LocalDateTime date;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String agree;
