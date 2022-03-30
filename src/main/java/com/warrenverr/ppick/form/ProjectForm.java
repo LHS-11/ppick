@@ -7,4 +7,19 @@ import lombok.Setter;
 @Setter
 public class ProjectForm {
 
+    private String title;
+
+    private String type;
+
+    private String export;
+
+    private String skill;
+
+    private String area;
+
+    private String content;
+
+    private String image;
+
+
 }
