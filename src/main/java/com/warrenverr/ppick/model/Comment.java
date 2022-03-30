@@ -1,18 +1,15 @@
 package com.warrenverr.ppick.model;
 
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 public class Comment {
 
     @Id
@@ -22,7 +19,6 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @CreatedDate
     private LocalDateTime createDate;
 
     @ManyToOne

@@ -1,8 +1,7 @@
 package com.warrenverr.ppick.model;
 
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -10,11 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
-@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Project {
 
@@ -46,10 +43,8 @@ public class Project {
     @Column(length = 50)
     private String projectDate;
 
-    @CreatedDate
     private LocalDateTime createDate;
 
-    @LastModifiedDate
     private LocalDateTime modifyDate;
 
     private int views;
@@ -62,8 +57,6 @@ public class Project {
     @ManyToOne
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Comment> commentList;
-
-    private String test;
 }
