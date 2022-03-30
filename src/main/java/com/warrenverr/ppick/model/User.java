@@ -1,13 +1,16 @@
 package com.warrenverr.ppick.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -30,6 +33,7 @@ public class User {
     private String job;
 
     @Column(length = 15)
+    @CreatedDate
     private String date;
 
     @Column(columnDefinition = "TEXT")
