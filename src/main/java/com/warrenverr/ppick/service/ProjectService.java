@@ -106,4 +106,11 @@ public class ProjectService {
             }
         };
     }
+
+    //프로젝트 좋아요
+    public ProjectDto like(ProjectDto projectDto, UserDto userDto) {
+        projectDto.getLikes().add(userDto);
+        this.projectRepository.save(of(projectDto));
+        return projectDto;
+    }
 }
