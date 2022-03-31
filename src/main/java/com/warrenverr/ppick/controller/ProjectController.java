@@ -20,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/project")
+@SessionAttributes("userInfo")
 public class ProjectController {
 
     private final ProjectService projectService;
@@ -44,6 +45,7 @@ public class ProjectController {
 
         ProjectDto projectDto = this.projectService.getProject(id);
         model.addAttribute("project",projectDto);
+
         return "project_detail";
 
     }
@@ -55,13 +57,14 @@ public class ProjectController {
     }
 
     @PostMapping("/write")
-    public String projectCreate(@Valid ProjectForm projectForm, BindingResult bindingResult /*TODO : 세션 정보 받아오기*/) {
+    public String projectCreate(@Valid ProjectForm projectForm, BindingResult bindingResult /*TODO : 세션 정보 받아오기*/, Model model) {
         if(bindingResult.hasErrors()) {
             return "project_form";
         }
 
         /*TODO : 세션 정보로 유저 불러오기*/
-        UserDto userDto = new UserDto();
+        UserDto userDto = (UserDto) model.getAttribute("userInfo");
+
         this.projectService.create(projectForm,userDto);
 
         return "redirect:/project/list";
