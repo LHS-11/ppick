@@ -29,7 +29,7 @@ public class UserService {
         userDto.setSkill(userCreateForm.getSkill());
         userDto.setJob(userCreateForm.getJob());
         userDto.setCategory(userCreateForm.getCategory());
-        userDto.setDetail_category(userCreateForm.getDetail_catrgory());
+        userDto.setDetail_category(userCreateForm.getDetail_category());
         userDto.setAgree(userCreateForm.getAgree());
         User user = of(userDto);
         this.userRepository.save(user);

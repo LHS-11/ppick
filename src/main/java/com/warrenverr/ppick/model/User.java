@@ -46,7 +46,7 @@ public class User {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String agree;
 
-    /*@Enumerated(EnumType.STRING)
-    private UserRole role;*/
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
 }

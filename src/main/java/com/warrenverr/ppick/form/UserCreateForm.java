@@ -13,7 +13,6 @@ public class UserCreateForm {
     private String skill;
     private String job;
     private String category;
-    private String detail_catrgory;
+    private String detail_category;
     private String agree;
-    /*private UserRole role;*/
 }
