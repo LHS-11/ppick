@@ -109,7 +109,7 @@ public class UserController {
         return userDto;
     }
 
-    @RequestMapping("/ss")
+    @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
         UserDto userDto = this.userService.loginByEmail("zxz4641@daum.net");
         HttpSession session = request.getSession();
