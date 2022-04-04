@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,8 +29,8 @@ public class User {
     @Column(length = 100, unique = true, nullable = false)
     private String nickname;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String skill;
+    @ElementCollection
+    private List<String> skill;
 
     @Column(length = 100, nullable = false)
     private String job;
