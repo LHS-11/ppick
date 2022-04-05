@@ -4,6 +4,8 @@ package com.warrenverr.ppick.Kakao;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -13,6 +15,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 public class KakaoAPI {
+
 
     public String getAccessTocken(String authorize_code) {
         String access_Token = "";
@@ -31,8 +34,8 @@ public class KakaoAPI {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
-            sb.append("&client_id=fdc70f02ba29ec48e4832add2c0099c5");
-            sb.append("&redirect_uri=http://www.semtle-cuk.site/kakao_login.do");
+            sb.append("&client_id=355ccd66392dd483c58a75147c6dbf5a");
+            sb.append("&redirect_uri=http://localhost:8080/user/login");
             sb.append("&code=" + authorize_code);
             bw.write(sb.toString());
             bw.flush();

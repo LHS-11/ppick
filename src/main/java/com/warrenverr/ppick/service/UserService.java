@@ -7,6 +7,7 @@ import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,7 +16,10 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    @Autowired
     private final UserRepository userRepository;
+
+
     private final ModelMapper modelMapper;
 
     private UserDto of(User user) { return this.modelMapper.map(user, UserDto.class); }
@@ -42,8 +46,10 @@ public class UserService {
         if(user.isPresent()) {
             return of(user.get());
         }else {
-            throw new DataNotFoundException("User not found");
+            throw new DataNotFoundException("project not found");
         }
     }
+
+
 
 }
