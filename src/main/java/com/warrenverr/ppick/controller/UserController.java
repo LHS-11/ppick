@@ -47,7 +47,7 @@ public class UserController {
 
         //TO DO : 다른 예외처리 해주기 (이메일입력안할시 말고 다른 경우)
         if(userCreateForm.getEmail() == "") {
-            bindingResult.rejectValue("email", "emaill will be not null", "이메일을 입력해주세요.");
+            bindingResult.rejectValue("email", "email will be not null", "이메일을 입력해주세요.");
             return dto;
         }
         try {

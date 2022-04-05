@@ -28,8 +28,6 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    private final UserService userService;
-
 
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -52,7 +50,7 @@ public class ProjectController {
 
     //프로젝트 상세 보기
     @RequestMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, ProjectForm projectForm) {
+    public String detail(Model model, @PathVariable("id") Integer id) {
 
         ProjectDto projectDto = this.projectService.getProject(id);
         model.addAttribute("project",projectDto);
@@ -68,29 +66,25 @@ public class ProjectController {
     }
 
     @PostMapping("/write")
-    public ProjectDto projectCreate(@Valid ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult /*TODO : 세션 정보 받아오기*/, Model model) {
+    public String projectCreate(@Valid ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
-            /*return "project_form";*/
+            return "project_form";
         }
         UserDto userDto = getUserSession(request);
-        /*TODO : 세션 정보로 유저 불러오기*/ //완료
-        ProjectDto projectDto = this.projectService.create(projectForm,userDto);
+        this.projectService.create(projectForm, userDto);
 
-        //return "redirect:/project/list";
-
-        return projectDto;
+        return "redirect:/project/list";
 
     }
 
     //프로젝트 수정
     @GetMapping("/modify/{id}")
-    public String projectModify(ProjectForm projectForm, @PathVariable("id") Integer id, HttpServletRequest request /*TODO : 세션 정보 받아오기*/) {
+    public String projectModify(ProjectForm projectForm, @PathVariable("id") Integer id, HttpServletRequest request) {
 
         ProjectDto projectDto = this.projectService.getProject(id);
-
         UserDto userDto = getUserSession(request);
-        //TODO : 수정 권한 확인
-        if(true) {
+
+        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
@@ -101,25 +95,24 @@ public class ProjectController {
         projectForm.setArea(projectDto.getArea());
         projectForm.setContent(projectDto.getContent());
         projectForm.setImage(projectDto.getImage());
-        projectForm.setProjectDate(projectDto.getProjectDate());
+        projectForm.setProjectStartDate(projectDto.getProjectStartDate());
+        projectForm.setProjectEndDate(projectDto.getProjectEndDate());
         return "project_form";
 
     }
 
     @PostMapping("/modify/{id}")
     public String projectModify(@Valid ProjectForm projectForm, BindingResult bindingResult,
-                                @PathVariable("id") Integer id, HttpServletRequest request /*TODO : 세션 정보 받아오기*/) {
+                                @PathVariable("id") Integer id, HttpServletRequest request) {
 
         UserDto userDto = getUserSession(request);
+        ProjectDto projectDto = this.projectService.getProject(id);
 
         if(bindingResult.hasErrors()) {
             return "project_form";
         }
 
-        ProjectDto projectDto = this.projectService.getProject(id);
-
-        //TODO : 수정 권한 확인
-        if(true) {
+        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.projectService.modify(projectDto, projectForm);
@@ -129,14 +122,12 @@ public class ProjectController {
 
     //프로젝트 삭제
     @GetMapping("/delete/{id}")
-    public String projectDelete(@PathVariable("id") Integer id, HttpServletRequest request /*TODO : 세션 정보 받아오기*/) {
+    public String projectDelete(@PathVariable("id") Integer id, HttpServletRequest request) {
 
         ProjectDto projectDto = this.projectService.getProject(id);
-
         UserDto userDto = getUserSession(request);
 
-        //TODO : 삭제 권한 확인
-        if(true) {
+        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
         }
         this.projectService.delete(projectDto);
@@ -146,12 +137,12 @@ public class ProjectController {
 
     //프로젝트 추천 누르기
     @GetMapping("/like/{id}")
-    public String projectLike(@PathVariable("id") Integer id, HttpServletRequest request /*TODO : 세션 정보 받아오기*/) {
+    public String projectLike(@PathVariable("id") Integer id, HttpServletRequest request) {
 
         ProjectDto projectDto = this.projectService.getProject(id);
-        /*TODO : 세션 정보로 유저 불러오기*/
         UserDto userDto = getUserSession(request);
-        this.projectService.like(projectDto,userDto);
+
+        this.projectService.like(projectDto, userDto);
         return String.format("redirect:/question/detail/%s", id);
 
     }
