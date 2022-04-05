@@ -48,7 +48,7 @@ class PpickApplicationTests {
 		userCreateForm.setSkill("JAVAScript");
 		userCreateForm.setJob("Student");
 		userCreateForm.setCategory("백엔드");
-		userCreateForm.setDetail_catrgory("JAVA");
+		userCreateForm.setDetail_category("JAVA");
 		userCreateForm.setAgree("Y");
 
 		UserDto userDto = userService.signup(userCreateForm);

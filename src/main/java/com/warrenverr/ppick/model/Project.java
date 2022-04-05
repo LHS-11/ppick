@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -31,8 +32,8 @@ public class Project {
     @Column(length = 100, nullable = false)
     private String export;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String skill;
+    @ElementCollection
+    private List<String> skill;
 
     @Column(length = 100, nullable = false)
     private String area;
@@ -43,8 +44,9 @@ public class Project {
     @Column(length = 255)
     private String image;
 
-    @Column(length = 50, nullable = false)
-    private String projectDate;
+    private LocalDate projectStartDate;
+
+    private LocalDate projectEndDate;
 
     @CreatedDate
     private LocalDateTime createDate;
@@ -56,7 +58,7 @@ public class Project {
     private int views;
 
     @ManyToMany
-    private Set<User> likes;
+    private List<User> likes;
 
     @ManyToOne
     private User author;

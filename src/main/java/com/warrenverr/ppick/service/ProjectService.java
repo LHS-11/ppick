@@ -47,7 +47,8 @@ public class ProjectService {
         projectDto.setArea(projectForm.getArea());
         projectDto.setContent(projectForm.getContent());
         projectDto.setImage(projectForm.getImage());
-        projectDto.setProjectDate(projectForm.getProjectDate());
+        projectDto.setProjectStartDate(projectForm.getProjectStartDate());
+        projectDto.setProjectEndDate(projectForm.getProjectEndDate());
         projectDto.setAuthor(userDto);
         Project project = of(projectDto);
         this.projectRepository.save(project);
@@ -84,7 +85,8 @@ public class ProjectService {
         projectDto.setArea(modifyProject.getArea());
         projectDto.setContent(modifyProject.getContent());
         projectDto.setImage(modifyProject.getImage());
-        projectDto.setProjectDate(modifyProject.getProjectDate());
+        projectDto.setProjectStartDate(modifyProject.getProjectStartDate());
+        projectDto.setProjectEndDate(modifyProject.getProjectEndDate());
         Project project = of(projectDto);
         this.projectRepository.save(project);
         return projectDto;
@@ -109,7 +111,10 @@ public class ProjectService {
 
     //프로젝트 좋아요
     public ProjectDto like(ProjectDto projectDto, UserDto userDto) {
-        projectDto.getLikes().add(userDto);
+        if(projectDto.getLikes().contains(userDto))
+            projectDto.getLikes().remove(userDto);
+        else
+            projectDto.getLikes().add(userDto);
         this.projectRepository.save(of(projectDto));
         return projectDto;
     }
