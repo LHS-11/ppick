@@ -1,11 +1,13 @@
 package com.warrenverr.ppick.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -57,10 +59,11 @@ public class Project {
     @ColumnDefault("0")
     private int views;
 
-    @ManyToMany
-    private List<User> likes;
+    @ElementCollection
+    private List<Long> likes;
 
     @ManyToOne
+    @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.ALL)

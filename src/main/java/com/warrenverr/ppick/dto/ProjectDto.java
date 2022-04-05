@@ -24,7 +24,7 @@ public class ProjectDto {
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
     private int views;
-    private List<UserDto> likes;
+    private List<Long> likes;
     private UserDto author;
     private List<CommentDto> commentList;
 }

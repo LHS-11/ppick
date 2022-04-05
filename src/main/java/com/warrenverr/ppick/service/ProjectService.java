@@ -111,10 +111,10 @@ public class ProjectService {
 
     //프로젝트 좋아요
     public ProjectDto like(ProjectDto projectDto, UserDto userDto) {
-        if(projectDto.getLikes().contains(userDto))
-            projectDto.getLikes().remove(userDto);
+        if(projectDto.getLikes().contains(userDto.getId()))
+            projectDto.getLikes().remove(userDto.getId());
         else
-            projectDto.getLikes().add(userDto);
+            projectDto.getLikes().add(userDto.getId());
         this.projectRepository.save(of(projectDto));
         return projectDto;
     }
