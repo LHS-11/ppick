@@ -10,5 +10,6 @@ public enum UserRole {
     //관리자, 비회원, 회원
     ADMIN("USER_ADMIN"), GUEST("USER_GUEST"), MEMBER("USER_MEMBER");
 
+
     private String value;
 }
