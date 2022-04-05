@@ -2,9 +2,11 @@ package com.warrenverr.ppick.service;
 
 import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.dto.ProjectDto;
+import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.model.Project;
 
+import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -37,7 +39,7 @@ public class ProjectService {
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
 
     //프로젝트 생성
-    public ProjectDto create(ProjectForm projectForm/*, User user*/) {
+    public ProjectDto create(ProjectForm projectForm, UserDto userDto) {
         ProjectDto projectDto = new ProjectDto();
         projectDto.setTitle(projectForm.getTitle());
         projectDto.setType(projectForm.getType());
@@ -47,6 +49,7 @@ public class ProjectService {
         projectDto.setContent(projectForm.getContent());
         projectDto.setImage(projectForm.getImage());
         projectDto.setProjectDate(projectForm.getProjectDate());
+        projectDto.setAuthor(userDto);
         Project project = of(projectDto);
         this.projectRepository.save(project);
         return projectDto;
@@ -104,5 +107,12 @@ public class ProjectService {
                         criteriaBuilder.like(root.get("content"), "%" + keyword + "%"));
             }
         };
+    }
+
+    //프로젝트 좋아요
+    public ProjectDto like(ProjectDto projectDto, UserDto userDto) {
+        projectDto.getLikes().add(userDto);
+        this.projectRepository.save(of(projectDto));
+        return projectDto;
     }
 }

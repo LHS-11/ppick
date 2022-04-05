@@ -18,5 +18,5 @@ public class UserDto {
     private String detail_category;
     private LocalDateTime date;
     private String agree;
-    private UserRole role;
+    /*private UserRole role;*/
 }

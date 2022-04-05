@@ -3,15 +3,21 @@ package com.warrenverr.ppick;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.warrenverr.ppick.dto.ProjectDto;
+import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
+import com.warrenverr.ppick.form.UserCreateForm;
 import com.warrenverr.ppick.model.Project;
+import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.repository.ProjectRepository;
+import com.warrenverr.ppick.repository.UserRepository;
 import com.warrenverr.ppick.service.ProjectService;
+import com.warrenverr.ppick.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +32,40 @@ class PpickApplicationTests {
 	@Autowired
 	private ProjectService projectService;
 
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private UserService userService;
+
+
+	@Test
+	void signup_test() {
+		UserCreateForm userCreateForm = new UserCreateForm();
+		userCreateForm.setSns_id("444");
+		userCreateForm.setEmail("444@daum.net");
+		userCreateForm.setNickname("444");
+		userCreateForm.setSkill("JAVAScript");
+		userCreateForm.setJob("Student");
+		userCreateForm.setCategory("백엔드");
+		userCreateForm.setDetail_catrgory("JAVA");
+		userCreateForm.setAgree("Y");
+
+		UserDto userDto = userService.signup(userCreateForm);
+	}
+
+	@Test
+	void login_test() {
+		UserDto userDto = userService.loginByEmail("444@daum.net");
+	}
+
+	@Test
+	void selectUser_test() {
+		List<User> userList = this.userRepository.findAll();
+		assertEquals("444", userList.get(1).getSns_id());
+	}
+
+
 	@Test
 	void create_test() {
 		ProjectForm projectForm = new ProjectForm();
@@ -38,7 +78,7 @@ class PpickApplicationTests {
 		projectForm.setImage("image");
 		projectForm.setProjectDate("내일");
 
-		ProjectDto projectDto = projectService.create(projectForm);
+		/*ProjectDto projectDto = projectService.create(projectForm);*/
 	}
 
 	@Test

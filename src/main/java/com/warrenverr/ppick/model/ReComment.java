@@ -20,9 +20,6 @@ public class ReComment {
     private Integer id;
 
     @ManyToOne
-    private Comment c_id;
-
-    @ManyToOne
     private User author;
 
     @ManyToOne
