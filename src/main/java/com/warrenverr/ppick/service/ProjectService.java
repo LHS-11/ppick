@@ -33,6 +33,7 @@ public class ProjectService {
     private  final ModelMapper modelMapper;
 
     private ProjectDto of(Project project) { return modelMapper.map(project, ProjectDto.class); }
+
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
 
     //프로젝트 생성
@@ -51,7 +52,8 @@ public class ProjectService {
         return projectDto;
     }
 
-    @Transactional
+    //프로젝트 조회회
+   @Transactional
     public ProjectDto getProject(Integer id) {
         Optional<Project> project = this.projectRepository.findById(id);
         if(project.isPresent()) {
