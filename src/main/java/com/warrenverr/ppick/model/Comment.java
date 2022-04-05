@@ -37,7 +37,7 @@ public class Comment {
     @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "comment", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "comment")
     private List<ReComment> reCommentList;
 
 }
