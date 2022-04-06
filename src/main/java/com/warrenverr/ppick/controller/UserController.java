@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.HashMap;
 
 @Getter
@@ -111,7 +112,7 @@ public class UserController {
 
     @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
-        UserDto userDto = this.userService.loginByEmail("ktykty0722@naver.com");
+        UserDto userDto = this.userService.loginByEmail("zxz4641@daum.net");
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;
@@ -123,4 +124,37 @@ public class UserController {
         UserDto userDto = (UserDto) session.getAttribute("userInfo");
         return userDto;
     }
+
+    @PostMapping("/modify")
+    public String userModify(@Valid UserCreateForm userCreateForm, BindingResult bindingResult, HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        UserDto userDto = (UserDto) session.getAttribute("userInfo");
+
+        if(bindingResult.hasErrors())
+            return "usermodi_form";
+        userCreateForm.setSns_id(userDto.getSns_id());
+        userCreateForm.setEmail(userDto.getEmail());
+        userCreateForm.setNickname(userDto.getNickname());
+        this.userService.modify(userDto, userCreateForm);
+        return "mainPage";
+    }
+
+    @GetMapping("/delete")
+    public String userDelete(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        UserDto userDto = (UserDto) session.getAttribute("userInfo");
+
+        this.userService.delete(userDto);
+        return "mainPage";
+    }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.invalidate();
+
+        return "mainPage";
+    }
+
+
 }

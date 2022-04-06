@@ -82,9 +82,9 @@ public class CommentController {
     //댓글 삭제
     @GetMapping("/delete/{id}")
     public String commentDelete(@PathVariable("id") Integer id, HttpServletRequest request) {
-
         CommentDto commentDto = this.commentService.getComment(id);
         UserDto userDto = getUserSession(request);
+
 
         if(!commentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
