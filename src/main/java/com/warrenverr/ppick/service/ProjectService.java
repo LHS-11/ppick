@@ -6,7 +6,6 @@ import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.model.Project;
 
-import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -35,6 +34,7 @@ public class ProjectService {
     private  final ModelMapper modelMapper;
 
     private ProjectDto of(Project project) { return modelMapper.map(project, ProjectDto.class); }
+
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
 
     //프로젝트 생성
@@ -55,7 +55,8 @@ public class ProjectService {
         return projectDto;
     }
 
-    @Transactional
+    //프로젝트 조회회
+   @Transactional
     public ProjectDto getProject(Integer id) {
         Optional<Project> project = this.projectRepository.findById(id);
         if(project.isPresent()) {
@@ -111,10 +112,10 @@ public class ProjectService {
 
     //프로젝트 좋아요
     public ProjectDto like(ProjectDto projectDto, UserDto userDto) {
-        if(projectDto.getLikes().contains(userDto))
-            projectDto.getLikes().remove(userDto);
+        if(projectDto.getLikes().contains(userDto.getId()))
+            projectDto.getLikes().remove(userDto.getId());
         else
-            projectDto.getLikes().add(userDto);
+            projectDto.getLikes().add(userDto.getId());
         this.projectRepository.save(of(projectDto));
         return projectDto;
     }

@@ -6,7 +6,6 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -24,7 +23,7 @@ public class ProjectDto {
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
     private int views;
-    private List<UserDto> likes;
+    private List<Long> likes;
     private UserDto author;
     private List<CommentDto> commentList;
 }

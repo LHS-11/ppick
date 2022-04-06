@@ -50,6 +50,17 @@ public class UserService {
         }
     }
 
+    public UserDto modify(UserDto userDto, UserCreateForm userCreateForm) {
+        userDto.setSkill(userCreateForm.getSkill());
+        userDto.setJob(userCreateForm.getJob());
+        userDto.setCategory(userCreateForm.getCategory());
+        userDto.setDetail_category(userCreateForm.getDetail_category());
+        userDto.setAgree(userCreateForm.getAgree());
+        User user = of(userDto);
+        this.userRepository.save(user);
+        return userDto;
+    }
 
+    public void delete(UserDto userDto) { this.userRepository.delete(of(userDto));}
 
 }

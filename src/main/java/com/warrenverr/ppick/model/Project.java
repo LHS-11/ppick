@@ -11,7 +11,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -57,13 +56,13 @@ public class Project {
     @ColumnDefault("0")
     private int views;
 
-    @ManyToMany
-    private List<User> likes;
+    @ElementCollection
+    private List<Long> likes;
 
     @ManyToOne
+    @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<Comment> commentList;
-
 }

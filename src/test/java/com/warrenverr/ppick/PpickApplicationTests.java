@@ -1,3 +1,4 @@
+/*
 package com.warrenverr.ppick;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,7 +79,9 @@ class PpickApplicationTests {
 		projectForm.setImage("image");
 		projectForm.setProjectDate("내일");
 
-		/*ProjectDto projectDto = projectService.create(projectForm);*/
+		*/
+/*ProjectDto projectDto = projectService.create(projectForm);*//*
+
 	}
 
 	@Test
@@ -127,3 +130,4 @@ class PpickApplicationTests {
 
 
 }
+*/
