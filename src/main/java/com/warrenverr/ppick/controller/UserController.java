@@ -111,7 +111,7 @@ public class UserController {
 
     @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
-        UserDto userDto = this.userService.loginByEmail("ghktjq1119@naver.com");
+        UserDto userDto = this.userService.loginByEmail("ktykty0722@naver.com");
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;

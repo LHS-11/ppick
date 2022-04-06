@@ -2,6 +2,7 @@ package com.warrenverr.ppick.form;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -36,8 +37,10 @@ public class ProjectForm {
     @NotEmpty(message = "프로젝트 이미지는 필수항목입니다.")
     private String image;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate projectStartDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate projectEndDate;
     
 

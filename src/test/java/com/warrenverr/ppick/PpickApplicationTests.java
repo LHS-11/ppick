@@ -38,21 +38,21 @@ class PpickApplicationTests {
 	@Autowired
 	private UserService userService;
 
+	/*
+	@Test
+	void signup_test() {
+		UserCreateForm userCreateForm = new UserCreateForm();
+		userCreateForm.setSns_id("444");
+		userCreateForm.setEmail("444@daum.net");
+		userCreateForm.setNickname("444");
+		userCreateForm.setSkill("JAVAScript");
+		userCreateForm.setJob("Student");
+		userCreateForm.setCategory("백엔드");
+		userCreateForm.setDetail_category("JAVA");
+		userCreateForm.setAgree("Y");
 
-//	@Test
-//	void signup_test() {
-//		UserCreateForm userCreateForm = new UserCreateForm();
-//		userCreateForm.setSns_id("444");
-//		userCreateForm.setEmail("444@daum.net");
-//		userCreateForm.setNickname("444");
-//		userCreateForm.setSkill("JAVAScript");
-//		userCreateForm.setJob("Student");
-//		userCreateForm.setCategory("백엔드");
-//		userCreateForm.setDetail_category("JAVA");
-//		userCreateForm.setAgree("Y");
-//
-//		UserDto userDto = userService.signup(userCreateForm);
-//	}
+		UserDto userDto = userService.signup(userCreateForm);
+	}
 
 	@Test
 	void login_test() {
@@ -66,20 +66,20 @@ class PpickApplicationTests {
 	}
 
 
-//	@Test
-//	void create_test() {
-//		ProjectForm projectForm = new ProjectForm();
-//		projectForm.setTitle("타이틀2");
-//		projectForm.setType("프로젝트 모집");
-//		projectForm.setExport("웹");
-//		projectForm.setSkill("백엔드");
-//		projectForm.setArea("서울");
-//		projectForm.setContent("내용");
-//		projectForm.setImage("image");
-//		projectForm.setProjectDate("내일");
-//
-//		/*ProjectDto projectDto = projectService.create(projectForm);*/
-//	}
+	@Test
+	void create_test() {
+		ProjectForm projectForm = new ProjectForm();
+		projectForm.setTitle("타이틀2");
+		projectForm.setType("프로젝트 모집");
+		projectForm.setExport("웹");
+		projectForm.setSkill("백엔드");
+		projectForm.setArea("서울");
+		projectForm.setContent("내용");
+		projectForm.setImage("image");
+		projectForm.setProjectDate("내일");
+
+		ProjectDto projectDto = projectService.create(projectForm);
+	}
 
 	@Test
 	void get_test() {
@@ -102,32 +102,52 @@ class PpickApplicationTests {
 		}
 	}
 
-//	@Test
-//	void modify_test() {
-//		ProjectDto projectDto = this.projectService.getProject(2);
-//		ProjectForm projectForm = new ProjectForm();
-//		projectForm.setTitle("제목1");
-//		projectForm.setType("프로젝트 모집");
-//		projectForm.setExport("앱");
-//		projectForm.setSkill("프론트엔드");
-//		projectForm.setArea("강원");
-//		projectForm.setContent("내용없음");
-//		projectForm.setImage("image123");
-//		projectForm.setProjectDate("그저께");
-//		this.projectService.modify(projectDto,projectForm);
-//	}
-//
-//	@Test
-//	void delete_test() {
-//		ProjectDto projectDto = this.projectService.getProject(1);
-//		this.projectService.delete(projectDto);
-//		List<Project> projectList = this.projectRepository.findAll();
-//		assertEquals(1,projectList.size());
-//	}
+	@Test
+	void modify_test() {
+		ProjectDto projectDto = this.projectService.getProject(2);
+		ProjectForm projectForm = new ProjectForm();
+		projectForm.setTitle("제목1");
+		projectForm.setType("프로젝트 모집");
+		projectForm.setExport("앱");
+		projectForm.setSkill("프론트엔드");
+		projectForm.setArea("강원");
+		projectForm.setContent("내용없음");
+		projectForm.setImage("image123");
+		projectForm.setProjectDate("그저께");
+		this.projectService.modify(projectDto,projectForm);
+	}
+
+	@Test
+	void delete_test() {
+		ProjectDto projectDto = this.projectService.getProject(1);
+		this.projectService.delete(projectDto);
+		List<Project> projectList = this.projectRepository.findAll();
+		assertEquals(1,projectList.size());
+	}
 
 
 	@Test
-	void testRecomment(){
-
+	void modify_test() {
+		ProjectDto projectDto = this.projectService.getProject(2);
+		ProjectForm projectForm = new ProjectForm();
+		projectForm.setTitle("제목1");
+		projectForm.setType("프로젝트 모집");
+		projectForm.setExport("앱");
+		projectForm.setSkill("프론트엔드");
+		projectForm.setArea("강원");
+		projectForm.setContent("내용없음");
+		projectForm.setImage("image123");
+		projectForm.setProjectDate("그저께");
+		this.projectService.modify(projectDto,projectForm);
 	}
+
+	@Test
+	void delete_test() {
+		ProjectDto projectDto = this.projectService.getProject(1);
+		this.projectService.delete(projectDto);
+		List<Project> projectList = this.projectRepository.findAll();
+		assertEquals(1,projectList.size());
+	}
+
+	*/
 }
