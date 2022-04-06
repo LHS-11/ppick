@@ -4,8 +4,6 @@ import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.UserCreateForm;
-import com.warrenverr.ppick.form.UserLoginForm;
-import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -112,7 +110,7 @@ public class UserController {
 
     @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
-        UserDto userDto = this.userService.loginByEmail("zxz4641@daum.net");
+        UserDto userDto = this.userService.loginByEmail("ktykty0722@naver.com");
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;
