@@ -28,6 +28,7 @@ public class ReCommentService {
         return modelMapper.map(reCommentDto, ReComment.class);
     }
 
+    //대댓글 생성
     public ReCommentDto create(CommentDto commentDto, String content, UserDto author){
         ReCommentDto reCommentDto = new ReCommentDto();
         reCommentDto.setAuthor(author);
@@ -48,6 +49,7 @@ public class ReCommentService {
         }
     }
 
+    //대댓글 수정
     public ReCommentDto modify(ReCommentDto reCommentDto,String content){
         reCommentDto.setContent(content);
         reCommentDto.setModifyDate(LocalDateTime.now());
@@ -55,6 +57,7 @@ public class ReCommentService {
         return reCommentDto;
     }
 
+    //대댓글 삭제
     public void delete(ReCommentDto reCommentDto){
         reCommentRepository.delete(of(reCommentDto));
     }
