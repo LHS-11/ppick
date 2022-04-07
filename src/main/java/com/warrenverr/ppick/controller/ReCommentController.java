@@ -1,10 +1,8 @@
 package com.warrenverr.ppick.controller;
 
 import com.warrenverr.ppick.dto.CommentDto;
-import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.ReCommentDto;
 import com.warrenverr.ppick.dto.UserDto;
-import com.warrenverr.ppick.form.CommentForm;
 import com.warrenverr.ppick.form.ReCommentForm;
 import com.warrenverr.ppick.service.CommentService;
 import com.warrenverr.ppick.service.ReCommentService;
@@ -25,7 +23,7 @@ import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/recoment")
+@RequestMapping("/recomment")
 public class ReCommentController {
 
     private final CommentService commentService;
@@ -47,14 +45,13 @@ public class ReCommentController {
                                 HttpServletRequest request, BindingResult bindingResult) {
         UserDto userDto = getUserSession(request);
         CommentDto commentDto = commentService.getComment(id);
-        ReCommentDto reCommentDto = reCommentService.getReComment(id);
         if(bindingResult.hasErrors()) {
             model.addAttribute("recomment", commentDto);
             return "recomment_detail";
         }
 
-        this.reCommentService.create(commentDto,reCommentDto.getContent(), userDto);
-        return String.format("redirect:/recomment/detail/%s",id);
+        this.reCommentService.create(commentDto,recommentForm.getContent(), userDto);
+        return String.format("redirect:/project/detail/%s",commentDto.getProject().getId());
     }
 
     //대댓글 수정
@@ -83,7 +80,7 @@ public class ReCommentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.reCommentService.modify(reCommentDto, recommentForm.getContent());
-        return String.format("redirect:/project/detail/%s",reCommentDto.getComment().getId());
+        return String.format("redirect:/project/detail/%s", reCommentDto.getComment().getProject().getId());
     }
 
     //대댓글 삭제
@@ -97,6 +94,6 @@ public class ReCommentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
         }
         this.reCommentService.delete(reCommentDto);
-        return String.format("redirect:/recomment/detail/%s",reCommentDto.getComment().getId());
+        return String.format("redirect:/project/detail/%s", reCommentDto.getComment().getProject().getId());
     }
 }

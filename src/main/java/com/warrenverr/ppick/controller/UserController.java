@@ -4,8 +4,6 @@ import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.UserCreateForm;
-import com.warrenverr.ppick.form.UserLoginForm;
-import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.HashMap;
 
 @Getter
@@ -123,4 +122,37 @@ public class UserController {
         UserDto userDto = (UserDto) session.getAttribute("userInfo");
         return userDto;
     }
+
+    @PostMapping("/modify")
+    public String userModify(@Valid UserCreateForm userCreateForm, BindingResult bindingResult, HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        UserDto userDto = (UserDto) session.getAttribute("userInfo");
+
+        if(bindingResult.hasErrors())
+            return "usermodi_form";
+        userCreateForm.setSns_id(userDto.getSns_id());
+        userCreateForm.setEmail(userDto.getEmail());
+        userCreateForm.setNickname(userDto.getNickname());
+        this.userService.modify(userDto, userCreateForm);
+        return "mainPage";
+    }
+
+    @GetMapping("/delete")
+    public String userDelete(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        UserDto userDto = (UserDto) session.getAttribute("userInfo");
+
+        this.userService.delete(userDto);
+        return "mainPage";
+    }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.invalidate();
+
+        return "mainPage";
+    }
+
+
 }

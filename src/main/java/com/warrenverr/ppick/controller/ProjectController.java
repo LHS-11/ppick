@@ -3,9 +3,7 @@ package com.warrenverr.ppick.controller;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
-import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.service.ProjectService;
-import com.warrenverr.ppick.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
