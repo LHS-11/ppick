@@ -41,6 +41,9 @@ public class User {
     @Column(length = 30, nullable = false)
     private String detail_category;
 
+    @Column(length = 255)
+    private String image;
+
     @CreatedDate
     private LocalDateTime date;
 
@@ -49,6 +52,5 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
-
 
 }
