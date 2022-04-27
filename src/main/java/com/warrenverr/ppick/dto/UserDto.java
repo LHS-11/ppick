@@ -1,5 +1,6 @@
 package com.warrenverr.ppick.dto;
 
+import com.warrenverr.ppick.model.UserProject;
 import com.warrenverr.ppick.role.UserRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,5 +24,6 @@ public class UserDto {
     private String agree;
     private UserRole role;
     private List<String> portfolio;
-
+    private List<UserProject> applyProjectList;
+    /*private List<UserProject> progressProjectList;*/
 }

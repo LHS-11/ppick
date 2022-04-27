@@ -1,5 +1,6 @@
 package com.warrenverr.ppick.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.warrenverr.ppick.role.UserRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,4 +54,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @ElementCollection
+    private List<String> portfolio;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<UserProject> applyProjectList;
+
+    /*@OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private List<UserProject> progressProjectList;*/
 }

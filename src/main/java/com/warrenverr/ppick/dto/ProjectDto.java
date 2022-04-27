@@ -1,5 +1,7 @@
 package com.warrenverr.ppick.dto;
 
+import com.warrenverr.ppick.model.Recruit;
+import com.warrenverr.ppick.model.UserProject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,4 +28,7 @@ public class ProjectDto {
     private List<Long> likes;
     private UserDto author;
     private List<CommentDto> commentList;
+    private List<Recruit> recruitList;
+    private List<UserProject> applyList;
+    private List<UserProject> projectMember;
 }

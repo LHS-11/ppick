@@ -63,7 +63,7 @@ public class ProjectController {
     }
 
     @PostMapping("/write")
-    public String projectCreate(@Valid ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
+    public String projectCreate(@Valid @RequestBody ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "project_form";
         }
@@ -94,12 +94,13 @@ public class ProjectController {
         projectForm.setImage(projectDto.getImage());
         projectForm.setProjectStartDate(projectDto.getProjectStartDate());
         projectForm.setProjectEndDate(projectDto.getProjectEndDate());
+        projectForm.setRecruitList(projectDto.getRecruitList());
         return "project_form";
 
     }
 
     @PostMapping("/modify/{id}")
-    public String projectModify(@Valid ProjectForm projectForm, BindingResult bindingResult,
+    public String projectModify(@Valid @RequestBody ProjectForm projectForm, BindingResult bindingResult,
                                 @PathVariable("id") Integer id, HttpServletRequest request) {
 
         UserDto userDto = getUserSession(request);
@@ -113,7 +114,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.projectService.modify(projectDto, projectForm);
-        return String.format("redirect:/question/detail/%s",id);
+        return String.format("redirect:/project/detail/%s",id);
 
     }
 
@@ -140,9 +141,25 @@ public class ProjectController {
         UserDto userDto = getUserSession(request);
 
         this.projectService.like(projectDto, userDto);
-        return String.format("redirect:/question/detail/%s", id);
+        return String.format("redirect:/project/detail/%s", id);
 
     }
 
+    //프로젝트 신청
+    @GetMapping("/ppick/{id}")
+    public String projectApply(@PathVariable("id") Integer id) {
 
+        return "project_apply";
+    }
+
+    @PostMapping("/ppick/{id}")
+    public String projectApply(@PathVariable("id") Integer id, HttpServletRequest request) {
+        ProjectDto projectDto = this.projectService.getProject(id);
+        UserDto userDto = getUserSession(request);
+
+        this.projectService.apply(projectDto,userDto);
+
+        return String.format("redirect:/project/detail/%s", id);
+
+    }
 }

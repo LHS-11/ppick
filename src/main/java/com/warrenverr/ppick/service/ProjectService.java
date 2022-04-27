@@ -5,7 +5,6 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.model.Project;
-
 import com.warrenverr.ppick.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,6 +30,10 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
+    private final RecruitService recruitService;
+
+    private final UserProjectService userProjectService;
+
     private  final ModelMapper modelMapper;
 
     private ProjectDto of(Project project) { return modelMapper.map(project, ProjectDto.class); }
@@ -52,6 +55,7 @@ public class ProjectService {
         projectDto.setAuthor(userDto);
         Project project = of(projectDto);
         this.projectRepository.save(project);
+        this.recruitService.create(project,projectForm.getRecruitList());
         return projectDto;
     }
 
@@ -90,6 +94,7 @@ public class ProjectService {
         projectDto.setProjectEndDate(modifyProject.getProjectEndDate());
         Project project = of(projectDto);
         this.projectRepository.save(project);
+        this.recruitService.modify(project, projectDto.getRecruitList(), modifyProject.getRecruitList());
         return projectDto;
     }
 
@@ -117,6 +122,12 @@ public class ProjectService {
         else
             projectDto.getLikes().add(userDto.getId());
         this.projectRepository.save(of(projectDto));
+        return projectDto;
+    }
+
+    //프로젝트 신청
+    public ProjectDto apply(ProjectDto projectDto, UserDto userDto) {
+        this.userProjectService.create(projectDto,userDto);
         return projectDto;
     }
 }
