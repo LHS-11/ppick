@@ -45,6 +45,12 @@ public class ProjectForm {
     private LocalDate projectEndDate;
 
     @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
-    private List<Recruit> recruitList;
+    private List<String> mainTask;
+
+    @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
+    private List<String> subTask;
+
+    @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
+    private List<Integer> recruitment;
 
 }

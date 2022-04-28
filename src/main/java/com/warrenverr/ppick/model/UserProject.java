@@ -21,5 +21,6 @@ public class UserProject {
     private User user;
 
     @ManyToOne
+    @JsonBackReference
     private Project project;
 }

@@ -1,10 +1,12 @@
 package com.warrenverr.ppick.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,16 +18,20 @@ public class Recruit {
     private Integer id;
 
     @Column(nullable = false)
-    private String mainTask;
+    @ElementCollection
+    private List<String> mainTask;
 
     @Column(nullable = false)
-    private String subTask;
+    @ElementCollection
+    private List<String> subTask;
 
     @Column(nullable = false)
     @ColumnDefault("0")
-    private int recruitment;
+    @ElementCollection
+    private List<Integer> recruitment;
 
     @ManyToOne
     @JoinColumn(name = "PROJECT_ID")
+    @JsonBackReference
     private Project project;
 }

@@ -5,6 +5,7 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.model.Project;
+import com.warrenverr.ppick.model.Recruit;
 import com.warrenverr.ppick.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -43,6 +44,13 @@ public class ProjectService {
     //프로젝트 생성
     public ProjectDto create(ProjectForm projectForm, UserDto userDto) {
         ProjectDto projectDto = new ProjectDto();
+        List<Recruit> recruit = new ArrayList<Recruit>();
+        Recruit R = new Recruit();
+        R.setMainTask(projectForm.getMainTask());
+        R.setSubTask(projectForm.getSubTask());
+        R.setRecruitment(projectForm.getRecruitment());
+        recruit.add(R);
+
         projectDto.setTitle(projectForm.getTitle());
         projectDto.setType(projectForm.getType());
         projectDto.setExport(projectForm.getExport());
@@ -53,9 +61,11 @@ public class ProjectService {
         projectDto.setProjectStartDate(projectForm.getProjectStartDate());
         projectDto.setProjectEndDate(projectForm.getProjectEndDate());
         projectDto.setAuthor(userDto);
+        projectDto.setRecruitList(recruit);
         Project project = of(projectDto);
         this.projectRepository.save(project);
-        this.recruitService.create(project,projectForm.getRecruitList());
+        this.recruitService.create(project,recruit);
+
         return projectDto;
     }
 
@@ -83,6 +93,12 @@ public class ProjectService {
 
     //프로젝트 수정
     public ProjectDto modify(ProjectDto projectDto, ProjectForm modifyProject) {
+        List<Recruit> recruit = new ArrayList<Recruit>();
+        Recruit R = new Recruit();
+        R.setMainTask(modifyProject.getMainTask());
+        R.setSubTask(modifyProject.getSubTask());
+        R.setRecruitment(modifyProject.getRecruitment());
+        recruit.add(R);
         projectDto.setTitle(modifyProject.getTitle());
         projectDto.setType(modifyProject.getType());
         projectDto.setExport(modifyProject.getExport());
@@ -94,7 +110,7 @@ public class ProjectService {
         projectDto.setProjectEndDate(modifyProject.getProjectEndDate());
         Project project = of(projectDto);
         this.projectRepository.save(project);
-        this.recruitService.modify(project, projectDto.getRecruitList(), modifyProject.getRecruitList());
+        this.recruitService.modify(project, recruit, recruit);
         return projectDto;
     }
 
