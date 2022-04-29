@@ -9,14 +9,13 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-public class UserProject {
+public class UserProjectApply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID")
     @JsonBackReference
     private User user;
 

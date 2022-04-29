@@ -3,8 +3,9 @@ package com.warrenverr.ppick.controller;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
-import com.warrenverr.ppick.model.Recruit;
 import com.warrenverr.ppick.service.ProjectService;
+import com.warrenverr.ppick.service.UserProjectApplyService;
+import com.warrenverr.ppick.service.UserProjectProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -27,6 +26,8 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final UserProjectApplyService userProjectApplyService;
+    private final UserProjectProgressService userProjectProgressService;
 
 
     public UserDto getUserSession(HttpServletRequest request) {
@@ -166,9 +167,17 @@ public class ProjectController {
         ProjectDto projectDto = this.projectService.getProject(id);
         UserDto userDto = getUserSession(request);
 
-        this.projectService.apply(projectDto,userDto);
+        this.userProjectApplyService.create(projectDto,userDto);
 
         return String.format("redirect:/project/detail/%s", id);
+    }
 
+    @PostMapping("/approve/{id}")
+    public String projectApprove(@PathVariable("id") Integer id, HttpServletRequest request) {
+        ProjectDto projectDto = this.projectService.getProject(id);
+        UserDto userDto = getUserSession(request);
+
+        this.userProjectProgressService.approve(projectDto,userDto);
+        return String.format("redirect:/project/detail/%s", id);
     }
 }

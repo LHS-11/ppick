@@ -2,10 +2,10 @@ package com.warrenverr.ppick.service;
 
 import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.dto.ProjectDto;
+import com.warrenverr.ppick.dto.RecruitDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.model.Project;
-import com.warrenverr.ppick.model.Recruit;
 import com.warrenverr.ppick.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -33,8 +33,6 @@ public class ProjectService {
 
     private final RecruitService recruitService;
 
-    private final UserProjectService userProjectService;
-
     private  final ModelMapper modelMapper;
 
     private ProjectDto of(Project project) { return modelMapper.map(project, ProjectDto.class); }
@@ -42,14 +40,15 @@ public class ProjectService {
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
 
     //프로젝트 생성
+    @Transactional
     public ProjectDto create(ProjectForm projectForm, UserDto userDto) {
         ProjectDto projectDto = new ProjectDto();
-        List<Recruit> recruit = new ArrayList<Recruit>();
-        Recruit R = new Recruit();
+        List<RecruitDto> recruitDto = new ArrayList<RecruitDto>();
+        RecruitDto R = new RecruitDto();
         R.setMainTask(projectForm.getMainTask());
         R.setSubTask(projectForm.getSubTask());
         R.setRecruitment(projectForm.getRecruitment());
-        recruit.add(R);
+        recruitDto.add(R);
 
         projectDto.setTitle(projectForm.getTitle());
         projectDto.setType(projectForm.getType());
@@ -61,10 +60,11 @@ public class ProjectService {
         projectDto.setProjectStartDate(projectForm.getProjectStartDate());
         projectDto.setProjectEndDate(projectForm.getProjectEndDate());
         projectDto.setAuthor(userDto);
-        projectDto.setRecruitList(recruit);
+        projectDto.setRecruitList(recruitDto);
         Project project = of(projectDto);
         this.projectRepository.save(project);
-        this.recruitService.create(project,recruit);
+        this.recruitService.create(project,recruitDto);
+
 
         return projectDto;
     }
@@ -93,12 +93,13 @@ public class ProjectService {
 
     //프로젝트 수정
     public ProjectDto modify(ProjectDto projectDto, ProjectForm modifyProject) {
-        List<Recruit> recruit = new ArrayList<Recruit>();
-        Recruit R = new Recruit();
+        List<RecruitDto> recruitDtoList = new ArrayList<RecruitDto>();
+        RecruitDto R = new RecruitDto();
         R.setMainTask(modifyProject.getMainTask());
         R.setSubTask(modifyProject.getSubTask());
         R.setRecruitment(modifyProject.getRecruitment());
-        recruit.add(R);
+        recruitDtoList.add(R);
+
         projectDto.setTitle(modifyProject.getTitle());
         projectDto.setType(modifyProject.getType());
         projectDto.setExport(modifyProject.getExport());
@@ -110,7 +111,7 @@ public class ProjectService {
         projectDto.setProjectEndDate(modifyProject.getProjectEndDate());
         Project project = of(projectDto);
         this.projectRepository.save(project);
-        this.recruitService.modify(project, recruit, recruit);
+        this.recruitService.modify(project, projectDto.getRecruitList(), recruitDtoList);
         return projectDto;
     }
 
@@ -141,9 +142,4 @@ public class ProjectService {
         return projectDto;
     }
 
-    //프로젝트 신청
-    public ProjectDto apply(ProjectDto projectDto, UserDto userDto) {
-        this.userProjectService.create(projectDto,userDto);
-        return projectDto;
-    }
 }

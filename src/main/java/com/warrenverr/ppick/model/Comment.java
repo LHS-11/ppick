@@ -30,11 +30,9 @@ public class Comment {
     private LocalDateTime modifyDate;
 
     @ManyToOne
-    @JoinColumn(name = "PROJECT_ID")
     private Project project;
 
     @ManyToOne
-    @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "comment", cascade = CascadeType.REMOVE ,orphanRemoval = true)
