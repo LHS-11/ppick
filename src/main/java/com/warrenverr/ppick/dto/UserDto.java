@@ -24,6 +24,7 @@ public class UserDto {
     private String agree;
     private UserRole role;
     private List<String> portfolio;
+
     @JsonManagedReference
     private List<UserProjectApplyDto> applyProjectList;
     @JsonManagedReference
