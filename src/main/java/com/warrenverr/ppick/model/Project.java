@@ -63,7 +63,6 @@ public class Project {
     @ManyToOne
     private User author;
 
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<Comment> commentList;
 
