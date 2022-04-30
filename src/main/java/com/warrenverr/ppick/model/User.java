@@ -1,5 +1,6 @@
 package com.warrenverr.ppick.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.warrenverr.ppick.role.UserRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +42,9 @@ public class User {
     @Column(length = 30, nullable = false)
     private String detail_category;
 
+    @Column(length = 255)
+    private String image;
+
     @CreatedDate
     private LocalDateTime date;
 
@@ -50,5 +54,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @ElementCollection
+    private List<String> portfolio;
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<UserProjectApply> applyProjectList;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private List<UserProjectProgress> progressProjectList;
 }

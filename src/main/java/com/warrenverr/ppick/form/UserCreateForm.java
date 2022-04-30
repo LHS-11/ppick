@@ -1,6 +1,5 @@
 package com.warrenverr.ppick.form;
 
-import com.warrenverr.ppick.role.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +15,8 @@ public class UserCreateForm {
     private String job;
     private String category;
     private String detail_category;
+    private String image;
     private String agree;
+    private List<String> portfolio;
+
 }

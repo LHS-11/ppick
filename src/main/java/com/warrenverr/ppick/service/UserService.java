@@ -35,6 +35,8 @@ public class UserService {
         userDto.setCategory(userCreateForm.getCategory());
         userDto.setDetail_category(userCreateForm.getDetail_category());
         userDto.setAgree(userCreateForm.getAgree());
+        userDto.setImage(userCreateForm.getImage());
+        userDto.setPortfolio(userCreateForm.getPortfolio());
         User user = of(userDto);
         this.userRepository.save(user);
 

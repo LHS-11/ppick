@@ -4,6 +4,8 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.service.ProjectService;
+import com.warrenverr.ppick.service.UserProjectApplyService;
+import com.warrenverr.ppick.service.UserProjectProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,8 @@ import javax.validation.Valid;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final UserProjectApplyService userProjectApplyService;
+    private final UserProjectProgressService userProjectProgressService;
 
 
     public UserDto getUserSession(HttpServletRequest request) {
@@ -47,12 +51,12 @@ public class ProjectController {
 
     //프로젝트 상세 보기
     @RequestMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id) {
+    public ProjectDto detail(Model model, @PathVariable("id") Integer id) {
 
         ProjectDto projectDto = this.projectService.getProject(id);
         model.addAttribute("project",projectDto);
 
-        return "project_detail";
+        return projectDto;
 
     }
 
@@ -63,7 +67,7 @@ public class ProjectController {
     }
 
     @PostMapping("/write")
-    public String projectCreate(@Valid ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
+    public String projectCreate(ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "project_form";
         }
@@ -85,6 +89,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
+
         projectForm.setTitle(projectDto.getTitle());
         projectForm.setType(projectDto.getType());
         projectForm.setExport(projectDto.getExport());
@@ -94,12 +99,18 @@ public class ProjectController {
         projectForm.setImage(projectDto.getImage());
         projectForm.setProjectStartDate(projectDto.getProjectStartDate());
         projectForm.setProjectEndDate(projectDto.getProjectEndDate());
+
+        //일단 0번방 꺼만 수정시 화면에 보이게 해놨어요
+        // Recruit의 0번방이 첫번째 데이터들이에요 이거 main 0, 1, 2 합친 상태로 mainTask에 뿌려줘야해요 이건 제가 나중에 할게요.
+        projectForm.setMainTask(projectDto.getRecruitList().get(0).getMainTask());
+        projectForm.setSubTask(projectDto.getRecruitList().get(0).getSubTask());
+        projectForm.setRecruitment(projectDto.getRecruitList().get(0).getRecruitment());
         return "project_form";
 
     }
 
     @PostMapping("/modify/{id}")
-    public String projectModify(@Valid ProjectForm projectForm, BindingResult bindingResult,
+    public String projectModify(@Valid @RequestBody ProjectForm projectForm, BindingResult bindingResult,
                                 @PathVariable("id") Integer id, HttpServletRequest request) {
 
         UserDto userDto = getUserSession(request);
@@ -113,7 +124,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.projectService.modify(projectDto, projectForm);
-        return String.format("redirect:/question/detail/%s",id);
+        return String.format("redirect:/project/detail/%s",id);
 
     }
 
@@ -140,9 +151,33 @@ public class ProjectController {
         UserDto userDto = getUserSession(request);
 
         this.projectService.like(projectDto, userDto);
-        return String.format("redirect:/question/detail/%s", id);
+        return String.format("redirect:/project/detail/%s", id);
 
     }
 
+    //프로젝트 신청
+    @GetMapping("/ppick/{id}")
+    public String projectApply(@PathVariable("id") Integer id) {
 
+        return "project_apply";
+    }
+
+    @PostMapping("/ppick/{id}")
+    public String projectApply(@PathVariable("id") Integer id, HttpServletRequest request) {
+        ProjectDto projectDto = this.projectService.getProject(id);
+        UserDto userDto = getUserSession(request);
+
+        this.userProjectApplyService.create(projectDto,userDto);
+
+        return String.format("redirect:/project/detail/%s", id);
+    }
+
+    @PostMapping("/approve/{id}")
+    public String projectApprove(@PathVariable("id") Integer id, HttpServletRequest request) {
+        ProjectDto projectDto = this.projectService.getProject(id);
+        UserDto userDto = getUserSession(request);
+
+        this.userProjectProgressService.approve(projectDto,userDto);
+        return String.format("redirect:/project/detail/%s", id);
+    }
 }
