@@ -1,6 +1,5 @@
 package com.warrenverr.ppick.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -63,19 +62,15 @@ public class Project {
     @ManyToOne
     private User author;
 
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<Comment> commentList;
 
-    @JsonManagedReference
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Recruit> recruitList;
 
-    @JsonManagedReference
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<UserProjectApply> applyList;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<User> applyList;
 
-    @JsonManagedReference
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<UserProjectProgress> projectMember;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<User> projectMember;
 }
