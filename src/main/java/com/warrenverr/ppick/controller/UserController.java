@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
         return "signup_form";
-    }
+    } 
 
     @PostMapping("/signup")
     public UserDto signup(UserCreateForm userCreateForm, BindingResult bindingResult) {
