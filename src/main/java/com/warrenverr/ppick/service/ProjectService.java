@@ -64,8 +64,6 @@ public class ProjectService {
         Project project = of(projectDto);
         this.projectRepository.save(project);
         this.recruitService.create(project,recruitDto);
-
-
         return projectDto;
     }
 

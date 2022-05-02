@@ -110,7 +110,7 @@ public class ProjectController {
     }
 
     @PostMapping("/modify/{id}")
-    public String projectModify(@Valid @RequestBody ProjectForm projectForm, BindingResult bindingResult,
+    public String projectModify(@Valid ProjectForm projectForm, BindingResult bindingResult,
                                 @PathVariable("id") Integer id, HttpServletRequest request) {
 
         UserDto userDto = getUserSession(request);
