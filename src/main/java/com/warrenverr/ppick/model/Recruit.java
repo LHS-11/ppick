@@ -1,6 +1,5 @@
 package com.warrenverr.ppick.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -30,7 +29,6 @@ public class Recruit {
     @ElementCollection
     private List<Integer> recruitment;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Project project;
 }

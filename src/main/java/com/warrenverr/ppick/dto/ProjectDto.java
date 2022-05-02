@@ -1,6 +1,5 @@
 package com.warrenverr.ppick.dto;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,10 +26,21 @@ public class ProjectDto {
     private List<Long> likes;
     private UserDto author;
     private List<CommentDto> commentList;
-    @JsonManagedReference
     private List<RecruitDto> recruitList;
-    @JsonManagedReference
-    private List<UserProjectApplyDto> applyList;
-    @JsonManagedReference
-    private List<UserProjectProgressDto> projectMember;
+    private List<UserDto> applyList;
+    private List<UserDto> projectMember;
+
+    /*public static ProjectDto instance = null;
+
+    public ProjectDto() {
+        getInstance();
+    }
+    public static ProjectDto getInstance() {
+        if(instance == null) {
+            instance = new ProjectDto();
+            return instance;
+        }else {
+            return instance;
+        }
+    }*/
 }

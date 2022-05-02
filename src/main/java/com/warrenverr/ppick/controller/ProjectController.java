@@ -4,8 +4,6 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.service.ProjectService;
-import com.warrenverr.ppick.service.UserProjectApplyService;
-import com.warrenverr.ppick.service.UserProjectProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -26,8 +24,6 @@ import javax.validation.Valid;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final UserProjectApplyService userProjectApplyService;
-    private final UserProjectProgressService userProjectProgressService;
 
 
     public UserDto getUserSession(HttpServletRequest request) {
@@ -110,7 +106,7 @@ public class ProjectController {
     }
 
     @PostMapping("/modify/{id}")
-    public String projectModify(@Valid @RequestBody ProjectForm projectForm, BindingResult bindingResult,
+    public String projectModify(@Valid ProjectForm projectForm, BindingResult bindingResult,
                                 @PathVariable("id") Integer id, HttpServletRequest request) {
 
         UserDto userDto = getUserSession(request);
@@ -167,8 +163,6 @@ public class ProjectController {
         ProjectDto projectDto = this.projectService.getProject(id);
         UserDto userDto = getUserSession(request);
 
-        this.userProjectApplyService.create(projectDto,userDto);
-
         return String.format("redirect:/project/detail/%s", id);
     }
 
@@ -177,7 +171,6 @@ public class ProjectController {
         ProjectDto projectDto = this.projectService.getProject(id);
         UserDto userDto = getUserSession(request);
 
-        this.userProjectProgressService.approve(projectDto,userDto);
         return String.format("redirect:/project/detail/%s", id);
     }
 }
