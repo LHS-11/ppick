@@ -39,6 +39,7 @@ public class ProjectService {
 
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
 
+    private ProjectDto of(ProjectForm projectForm) { return modelMapper.map(projectForm, ProjectDto.class); }
     //프로젝트 생성
     @Transactional
     public ProjectDto create(ProjectForm projectForm, UserDto userDto) {
