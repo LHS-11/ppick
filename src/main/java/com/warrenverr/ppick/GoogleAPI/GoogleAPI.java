@@ -5,6 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,74 +29,83 @@ public class GoogleAPI {
 
     final static String GOOGLE_AUTH_BASE_URL = "https://accounts.google.com/o/oauth2/v2/auth";
     final static String GOOGLE_TOKEN_BASE_URL = "https://oauth2.googleapis.com/token";
+    final static String GOOGLE_TOKEN_INFO_URL = "https://www.googleapis.com/oauth2/v1/tokeninfo";
     final static String GOOGLE_REVOKE_TOKEN_BASE_URL = "https://oauth2.googleapis.com/revoke";
 
-    @Value("${api.client_id")
-    String clientId;
-    @Value("${api.client_secret")
-    String clientSecret;
 
-    @GetMapping("google/auth")
-    public HashMap<String, Object> gooleAuth(Model model, @RequestParam(value="code") String authCode) throws JsonProcessingException {
-        //Http Request를 위한 RestTemplate
-        RestTemplate restTemplate = new RestTemplate();
+    String clientId = "151434471836-i4vcjfpu0702hmj7bc8hi9tasvufflcl.apps.googleusercontent.com";
+    String clientSecret = "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";
 
-        //Google OAuth Access Token 요청을 위한 파라미터 세팅
-        GoogleOAuthRequest googleOAuthRequestParam = GoogleOAuthRequest.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .code(authCode)
-                .redirectUri("http://localhost:8080/user/login")
-                .grantType("authorization_code").build();
+    public String getAccessToken(String authorize_code) {
+        String access_Token = "";
+        String refresh_Token = "";
 
-        //JSON 파싱을 위한 기본값 세팅
-        //요청시 파라미터는 스네이크 케이스로 세팅되므로 Object mapper에 미리 설정해준다.
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        try {
+            URL url = new URL(GOOGLE_TOKEN_BASE_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
 
-        //AccessToken 발급 요청
-        ResponseEntity<String> resultEntity = restTemplate.postForEntity(GOOGLE_TOKEN_BASE_URL, googleOAuthRequestParam, String.class);
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+            StringBuilder sb = new StringBuilder();
+            sb.append("client_id=" + clientId);
+            sb.append("&client_secret=" + clientSecret);
+            sb.append("&code=" + authorize_code);
+            sb.append("&grant_type=authorization_code");
+            sb.append("&redirect_uri=http://localhost:8080/user/Google_login");
+            bw.write(sb.toString());
+            bw.flush();
 
-        //Token Request
-        GoogleOAuthResponse result = mapper.readValue(resultEntity.getBody(), new TypeReference<GoogleOAuthResponse>() {
-        });
+            int responseCode = conn.getResponseCode();
 
-        System.out.println(resultEntity.getBody());
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line = "";
+            String result = "";
 
-        //ID Token만 추출 (사용자 정보는 jwt로 인코딩 되어있음.)
-        String jwtToken = result.getIdToken();
-        String requestUrl = UriComponentsBuilder.fromHttpUrl("https://oauth2.googleapis.com/tokeninfo")
-                .queryParam("id_token", jwtToken).encode().toUriString();
-        String resultJson = restTemplate.getForObject(requestUrl, String.class);
+            while ((line = br.readLine()) != null)
+                result += line;
 
-        HashMap<String, Object> userInfo = mapper.readValue(resultJson, new TypeReference<HashMap<String, Object>>(){});
-        model.addAllAttributes(userInfo);
-        model.addAttribute("token", result.getAccessToken());
-        System.out.println("Google user_id : " + userInfo.get("user_id"));
-        System.out.println("Google user_email : " + userInfo.get("email"));
+            System.out.println("response body : " + result);
+            //Gson 라이브러르에 포함된 클래스로 json파싱
+            JsonParser parser = new JsonParser();
+            JsonElement element = parser.parse(result);
 
+            access_Token = element.getAsJsonObject().get("id_token").getAsString();
+
+            System.out.println("id_token : " + access_Token);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return access_Token;
+    }
+
+    public HashMap<String, Object> getUserInfo(String id_token) {
+        HashMap<String, Object> userInfo = new HashMap<>();
+        String url = GOOGLE_TOKEN_INFO_URL + "?id_token="+id_token;
+        try {
+            HttpURLConnection con;
+            URL googleURL = new URL(url);
+            con = (HttpURLConnection) googleURL.openConnection();
+
+            InputStream is = con.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+            BufferedReader in = new BufferedReader(isr);
+
+            JsonParser parser = new JsonParser();
+            JsonElement element = parser.parse(in);
+
+            String sns_id = element.getAsJsonObject().get("user_id").getAsString();
+            String email = element.getAsJsonObject().get("email").getAsString();
+            System.out.println("sns_id = " + sns_id);
+            System.out.println("email = " + email);
+            userInfo.put("sns_id", sns_id);
+            userInfo.put("email", email);
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
         return userInfo;
     }
-
-    @GetMapping("google/revoke/token")
-    @ResponseBody
-    public HashMap<String, Object> revokeToken(@RequestParam(value = "token") String token) throws JsonProcessingException {
-
-        HashMap<String, Object> result = new HashMap<>();
-        RestTemplate restTemplate = new RestTemplate();
-        final String requestUrl = UriComponentsBuilder.fromHttpUrl(GOOGLE_REVOKE_TOKEN_BASE_URL)
-                .queryParam("token", token).encode().toUriString();
-
-        System.out.println("TOKEN ? " + token);
-
-        String resultJson = restTemplate.postForObject(requestUrl, null, String.class);
-        result.put("result", "success");
-        result.put("resultJson", resultJson);
-
-        return result;
-
-    }
-
 
 }
