@@ -1,11 +1,9 @@
 package com.warrenverr.ppick.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.warrenverr.ppick.role.UserRole;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -61,9 +59,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
-    private List<UserProject> applyProjectList;
+    private List<UserProjectApply> applyProjectList;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user")
-    private List<UserProject> progressProjectList;
+    private List<UserProjectProgress> progressProjectList;
 }

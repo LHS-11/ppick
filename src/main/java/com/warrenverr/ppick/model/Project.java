@@ -1,10 +1,8 @@
 package com.warrenverr.ppick.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -63,10 +61,9 @@ public class Project {
     private List<Long> likes;
 
     @ManyToOne
-    @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
-    @JsonManagedReference
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<Comment> commentList;
 
@@ -76,9 +73,9 @@ public class Project {
 
     @JsonManagedReference
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<UserProject> applyList;
+    private List<UserProjectApply> applyList;
 
     @JsonManagedReference
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<UserProject> projectMember;
+    private List<UserProjectProgress> projectMember;
 }

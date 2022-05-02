@@ -162,6 +162,7 @@ public class UserController {
     @RequestMapping("/JustLogin")
     public UserDto JustLogin(@ModelAttribute("email") String email, HttpServletRequest request,Model model) {
         UserDto userDto = this.userService.loginByEmail(email);
+        UserDto userDto = this.userService.loginByEmail("ktykty0722@naver.com");
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;

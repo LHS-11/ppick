@@ -30,8 +30,7 @@ public class Recruit {
     @ElementCollection
     private List<Integer> recruitment;
 
-    @ManyToOne
-    @JoinColumn(name = "PROJECT_ID")
+    @ManyToOne(cascade = CascadeType.ALL)
     @JsonBackReference
     private Project project;
 }
