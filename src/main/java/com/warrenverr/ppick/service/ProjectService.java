@@ -43,27 +43,21 @@ public class ProjectService {
     @Transactional
     public ProjectDto create(ProjectForm projectForm, UserDto userDto) {
         ProjectDto projectDto = new ProjectDto();
-        List<RecruitDto> recruitDto = new ArrayList<RecruitDto>();
+        List<RecruitDto> recruitDtoList = new ArrayList<RecruitDto>();
         RecruitDto R = new RecruitDto();
         R.setMainTask(projectForm.getMainTask());
         R.setSubTask(projectForm.getSubTask());
         R.setRecruitment(projectForm.getRecruitment());
-        recruitDto.add(R);
+        recruitDtoList.add(R);
 
-        projectDto.setTitle(projectForm.getTitle());
-        projectDto.setType(projectForm.getType());
-        projectDto.setExport(projectForm.getExport());
-        projectDto.setSkill(projectForm.getSkill());
-        projectDto.setArea(projectForm.getArea());
-        projectDto.setContent(projectForm.getContent());
-        projectDto.setImage(projectForm.getImage());
-        projectDto.setProjectStartDate(projectForm.getProjectStartDate());
-        projectDto.setProjectEndDate(projectForm.getProjectEndDate());
+        projectDto = of(projectForm);
         projectDto.setAuthor(userDto);
-        projectDto.setRecruitList(recruitDto);
+        projectDto.setRecruitList(recruitDtoList);
         Project project = of(projectDto);
         this.projectRepository.save(project);
-        this.recruitService.create(project,recruitDto);
+        for (RecruitDto dto : recruitDtoList) dto.setProject(project);
+        this.recruitService.create(recruitDtoList);
+
         return projectDto;
     }
 
@@ -107,9 +101,11 @@ public class ProjectService {
         projectDto.setImage(modifyProject.getImage());
         projectDto.setProjectStartDate(modifyProject.getProjectStartDate());
         projectDto.setProjectEndDate(modifyProject.getProjectEndDate());
+        /*projectDto = of(modifyProject);*/
         Project project = of(projectDto);
         this.projectRepository.save(project);
-        this.recruitService.modify(project, projectDto.getRecruitList(), recruitDtoList);
+        for (RecruitDto dto : recruitDtoList) dto.setProject(project);
+        this.recruitService.modify(projectDto.getRecruitList(), recruitDtoList);
         return projectDto;
     }
 

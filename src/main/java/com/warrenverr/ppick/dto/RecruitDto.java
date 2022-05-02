@@ -1,6 +1,5 @@
 package com.warrenverr.ppick.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.warrenverr.ppick.model.Project;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +14,5 @@ public class RecruitDto {
     private List<String> mainTask;
     private List<String> subTask;
     private List<Integer> recruitment;
-    @JsonBackReference
     private Project project;
 }
