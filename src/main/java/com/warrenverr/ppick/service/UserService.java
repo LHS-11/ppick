@@ -31,8 +31,8 @@ public class UserService {
         return userDto;
     }
 
-    public UserDto loginByEmail(String email) {
-        Optional<User> user = this.userRepository.findByEmail(email);
+    public UserDto loginBySnsid(String snsid) {
+        Optional<User> user = this.userRepository.findBySnsid(snsid);
         if(user.isPresent()) {
             return of(user.get());
         }else {
@@ -40,6 +40,16 @@ public class UserService {
         }
     }
 
+
+    /*public UserDto loginByEmail(String email) {
+        Optional<User> user = this.userRepository.findByEmail(email);
+        if(user.isPresent()) {
+            return of(user.get());
+        }else {
+            throw new DataNotFoundException("project not found");
+        }
+    }
+*/
     public UserDto modify(UserDto userDto, UserCreateForm userCreateForm) {
         userDto.setSkill(userCreateForm.getSkill());
         userDto.setJob(userCreateForm.getJob());
