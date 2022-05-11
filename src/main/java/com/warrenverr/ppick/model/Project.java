@@ -18,6 +18,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Project {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
