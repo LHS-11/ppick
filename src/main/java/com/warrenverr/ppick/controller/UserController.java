@@ -68,6 +68,12 @@ public class UserController {
         return dto;
     }
 
+    @RequestMapping("/GitHub_login")
+    public String GitHubLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
+        return "github";
+    }
+
+
 
     @RequestMapping("/Google_login")
     public UserDto GoogleLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
