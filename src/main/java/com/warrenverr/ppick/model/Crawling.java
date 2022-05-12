@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-public class CrawlingModel {
+public class Crawling {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

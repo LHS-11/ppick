@@ -26,21 +26,7 @@ public class ProjectDto {
     private List<Long> likes;
     private UserDto author;
     private List<CommentDto> commentList;
-    private List<RecruitDto> recruitList;
-    private List<UserDto> applyList;
+    private RecruitDto recruit;
+    private List<ProjectApplyDto> applyList;
     private List<UserDto> projectMember;
-
-    /*public static ProjectDto instance = null;
-
-    public ProjectDto() {
-        getInstance();
-    }
-    public static ProjectDto getInstance() {
-        if(instance == null) {
-            instance = new ProjectDto();
-            return instance;
-        }else {
-            return instance;
-        }
-    }*/
 }

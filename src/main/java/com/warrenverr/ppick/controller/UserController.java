@@ -3,8 +3,11 @@ package com.warrenverr.ppick.controller;
 import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.GoogleAPI.GoogleAPI;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
+import com.warrenverr.ppick.dto.ProjectApplyDto;
+import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.UserCreateForm;
+import com.warrenverr.ppick.service.ProjectService;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,15 @@ public class UserController {
     private String nickname;
 
     private final UserService userService;
+
+    private final ProjectService projectService;
+
+    public UserDto getUserSession(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        UserDto userDto = (UserDto) session.getAttribute("userInfo");
+
+        return userDto;
+    }
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
@@ -205,5 +217,13 @@ public class UserController {
         return "mainPage";
     }
 
+    @PostMapping("/approve/{id}")
+    public String projectApprove(@PathVariable("id") Integer id, HttpServletRequest request) {
+        Integer projectId = Integer.valueOf(request.getParameter("projectId"));
+        ProjectDto projectDto = this.projectService.getProject(projectId);
+        UserDto userDto = getUserSession(request);
+        this.userService.approve(projectDto, id);
+        return String.format("redirect:/project/detail/%s", id);
+    }
 
 }
