@@ -2,7 +2,9 @@ package com.warrenverr.ppick.controller;
 
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
+import com.warrenverr.ppick.form.ProjectApplyForm;
 import com.warrenverr.ppick.form.ProjectForm;
+import com.warrenverr.ppick.model.ProjectApply;
 import com.warrenverr.ppick.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +26,6 @@ import javax.validation.Valid;
 public class ProjectController {
 
     private final ProjectService projectService;
-
 
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -95,12 +96,10 @@ public class ProjectController {
         projectForm.setImage(projectDto.getImage());
         projectForm.setProjectStartDate(projectDto.getProjectStartDate());
         projectForm.setProjectEndDate(projectDto.getProjectEndDate());
+        projectForm.setMainTask(projectDto.getRecruit().getMainTask());
+        projectForm.setSubTask(projectDto.getRecruit().getSubTask());
+        projectForm.setRecruitment(projectDto.getRecruit().getRecruitment());
 
-        //일단 0번방 꺼만 수정시 화면에 보이게 해놨어요
-        // Recruit의 0번방이 첫번째 데이터들이에요 이거 main 0, 1, 2 합친 상태로 mainTask에 뿌려줘야해요 이건 제가 나중에 할게요.
-        projectForm.setMainTask(projectDto.getRecruitList().get(0).getMainTask());
-        projectForm.setSubTask(projectDto.getRecruitList().get(0).getSubTask());
-        projectForm.setRecruitment(projectDto.getRecruitList().get(0).getRecruitment());
         return "project_form";
 
     }
@@ -153,24 +152,19 @@ public class ProjectController {
 
     //프로젝트 신청
     @GetMapping("/ppick/{id}")
-    public String projectApply(@PathVariable("id") Integer id) {
-
-        return "project_apply";
+    public String projectApply(ProjectApplyForm projectApplyForm) {
+        return "projectApplyForm";
     }
 
     @PostMapping("/ppick/{id}")
-    public String projectApply(@PathVariable("id") Integer id, HttpServletRequest request) {
+    public String projectApply(@PathVariable("id") Integer id, @Valid ProjectApplyForm projectApplyForm, BindingResult bindingResult, HttpServletRequest request) {
         ProjectDto projectDto = this.projectService.getProject(id);
         UserDto userDto = getUserSession(request);
-
+        if(bindingResult.hasErrors()) {
+            return "project_form";
+        }
+        projectService.apply(projectDto, userDto, projectApplyForm);
         return String.format("redirect:/project/detail/%s", id);
     }
 
-    @PostMapping("/approve/{id}")
-    public String projectApprove(@PathVariable("id") Integer id, HttpServletRequest request) {
-        ProjectDto projectDto = this.projectService.getProject(id);
-        UserDto userDto = getUserSession(request);
-
-        return String.format("redirect:/project/detail/%s", id);
-    }
 }

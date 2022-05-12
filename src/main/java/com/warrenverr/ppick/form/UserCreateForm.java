@@ -19,5 +19,4 @@ public class UserCreateForm {
     private String image;
     private String agree;
     private List<String> portfolio;
-
 }

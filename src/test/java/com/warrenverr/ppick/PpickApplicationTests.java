@@ -1,4 +1,3 @@
-/*
 package com.warrenverr.ppick;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +38,7 @@ class PpickApplicationTests {
 	@Autowired
 	private UserService userService;
 
-
+	/*
 	@Test
 	void signup_test() {
 		UserCreateForm userCreateForm = new UserCreateForm();
@@ -79,9 +78,7 @@ class PpickApplicationTests {
 		projectForm.setImage("image");
 		projectForm.setProjectDate("내일");
 
-		*/
-/*ProjectDto projectDto = projectService.create(projectForm);*//*
-
+		ProjectDto projectDto = projectService.create(projectForm);
 	}
 
 	@Test
@@ -129,5 +126,28 @@ class PpickApplicationTests {
 	}
 
 
+	@Test
+	void modify_test() {
+		ProjectDto projectDto = this.projectService.getProject(2);
+		ProjectForm projectForm = new ProjectForm();
+		projectForm.setTitle("제목1");
+		projectForm.setType("프로젝트 모집");
+		projectForm.setExport("앱");
+		projectForm.setSkill("프론트엔드");
+		projectForm.setArea("강원");
+		projectForm.setContent("내용없음");
+		projectForm.setImage("image123");
+		projectForm.setProjectDate("그저께");
+		this.projectService.modify(projectDto,projectForm);
+	}
+
+	@Test
+	void delete_test() {
+		ProjectDto projectDto = this.projectService.getProject(1);
+		this.projectService.delete(projectDto);
+		List<Project> projectList = this.projectRepository.findAll();
+		assertEquals(1,projectList.size());
+	}
+
+	*/
 }
-*/

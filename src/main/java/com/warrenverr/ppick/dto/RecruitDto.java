@@ -14,5 +14,4 @@ public class RecruitDto {
     private List<String> mainTask;
     private List<String> subTask;
     private List<Integer> recruitment;
-    private Project project;
 }

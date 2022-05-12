@@ -29,6 +29,4 @@ public class Recruit {
     @ElementCollection
     private List<Integer> recruitment;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    private Project project;
 }

@@ -18,6 +18,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Project {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -62,14 +63,14 @@ public class Project {
     @ManyToOne
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE ,orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<Comment> commentList;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Recruit> recruitList;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    private Recruit recruit;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<User> applyList;
+    private List<ProjectApply> applyList;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<User> projectMember;
