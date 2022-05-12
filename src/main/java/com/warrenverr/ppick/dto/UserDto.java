@@ -4,6 +4,7 @@ import com.warrenverr.ppick.role.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @Setter
 public class UserDto {
     private Long id;
-    private String sns_id;
+    private String snsid;
     private String email;
     private String nickname;
     private List<String> skill;

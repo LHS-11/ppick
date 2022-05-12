@@ -28,7 +28,7 @@ import java.util.HashMap;
 @ResponseBody
 public class UserController {
 
-    private String sns_id;
+    private String snsid;
     private String email;
     private String nickname;
 
@@ -51,7 +51,7 @@ public class UserController {
             return dto;
         }
         try {
-            userCreateForm.setSns_id(sns_id);
+            userCreateForm.setSnsid(snsid);
             userCreateForm.setEmail(email);
             //구글 로그인은 nickname을 안받아오므로 구글에서는 ""칸 주입
             userCreateForm.setNickname(nickname);
@@ -81,14 +81,14 @@ public class UserController {
 
         HttpSession session = request.getSession();
         String email = googleInfo.get("email").toString();
-        String sns_id = googleInfo.get("sns_id").toString();
+        String snsid = googleInfo.get("sns_id").toString();
         String nickname = "";
         try {
-            userDto = this.userService.loginByEmail(email);
+            userDto = this.userService.loginBySnsid(snsid);
         }catch(DataNotFoundException e1) {
             System.out.println("이게 나오면 첫 구글 로그인 성공");
             try {
-                setSns_id(sns_id);
+                setSnsid(snsid);
                 setEmail(email);
                 setNickname(nickname);
             }catch(DataIntegrityViolationException e2) {
@@ -121,15 +121,15 @@ public class UserController {
 
         HttpSession session = request.getSession();
         String email = kakaoInfo.get("email").toString();
-        String sns_id = kakaoInfo.get("sns_id").toString();
+        String snsid = kakaoInfo.get("sns_id").toString();
         String nickname = kakaoInfo.get("nickName").toString();
 
         try {
-            userDto = this.userService.loginByEmail(email);
+            userDto = this.userService.loginBySnsid(snsid);
         }catch(DataNotFoundException e1) {
             System.out.println("이게 나오면 첫 카카오 로그인 성공");
             try {
-                setSns_id(sns_id);
+                setSnsid(snsid);
                 setNickname(nickname);
                 setEmail(email);
                 //회원가입 폼으로 이동 해주기  현재 그냥 임의값 넣었음
@@ -149,19 +149,19 @@ public class UserController {
         model.addAttribute("userInfo", userDto);
         return userDto;
     }
-
+/*
     @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
-        UserDto userDto = this.userService.loginByEmail("ghktjq1119@naver.com");
+        UserDto userDto = this.userService.loginBySnsId("dbswl@naver.com");
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;
-    }
+    }*/
 
 
     @RequestMapping("/JustLogin")
-    public UserDto JustLogin(@ModelAttribute("email") String email, HttpServletRequest request,Model model) {
-        UserDto userDto = this.userService.loginByEmail(email);
+    public UserDto JustLogin(@ModelAttribute("sns_id") String sns_id, HttpServletRequest request,Model model) {
+        UserDto userDto = this.userService.loginBySnsid(sns_id);
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;
@@ -182,7 +182,7 @@ public class UserController {
 
         if(bindingResult.hasErrors())
             return "usermodi_form";
-        userCreateForm.setSns_id(userDto.getSns_id());
+        userCreateForm.setSnsid(userDto.getSnsid());
         userCreateForm.setEmail(userDto.getEmail());
         userCreateForm.setNickname(userDto.getNickname());
         this.userService.modify(userDto, userCreateForm);

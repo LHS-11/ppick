@@ -21,7 +21,7 @@ public class User {
     private Long id;
 
     @Column(length = 255, unique = true, nullable = false)
-    private String sns_id;
+    private String snsid;
 
     @Column(length = 255, unique = true, nullable = false)
     private String email;
