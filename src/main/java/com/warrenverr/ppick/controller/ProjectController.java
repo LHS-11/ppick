@@ -2,7 +2,9 @@ package com.warrenverr.ppick.controller;
 
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
+import com.warrenverr.ppick.form.ProjectApplyForm;
 import com.warrenverr.ppick.form.ProjectForm;
+import com.warrenverr.ppick.model.ProjectApply;
 import com.warrenverr.ppick.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +27,6 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
         UserDto userDto = (UserDto) session.getAttribute("userInfo");
@@ -47,12 +48,12 @@ public class ProjectController {
 
     //프로젝트 상세 보기
     @RequestMapping(value = "/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id) {
+    public ProjectDto detail(Model model, @PathVariable("id") Integer id) {
 
         ProjectDto projectDto = this.projectService.getProject(id);
         model.addAttribute("project",projectDto);
 
-        return "project_detail";
+        return projectDto;
 
     }
 
@@ -63,7 +64,7 @@ public class ProjectController {
     }
 
     @PostMapping("/write")
-    public String projectCreate(@Valid ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
+    public String projectCreate(ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return "project_form";
         }
@@ -85,6 +86,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
+
         projectForm.setTitle(projectDto.getTitle());
         projectForm.setType(projectDto.getType());
         projectForm.setExport(projectDto.getExport());
@@ -94,6 +96,10 @@ public class ProjectController {
         projectForm.setImage(projectDto.getImage());
         projectForm.setProjectStartDate(projectDto.getProjectStartDate());
         projectForm.setProjectEndDate(projectDto.getProjectEndDate());
+        projectForm.setMainTask(projectDto.getRecruit().getMainTask());
+        projectForm.setSubTask(projectDto.getRecruit().getSubTask());
+        projectForm.setRecruitment(projectDto.getRecruit().getRecruitment());
+
         return "project_form";
 
     }
@@ -113,7 +119,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.projectService.modify(projectDto, projectForm);
-        return String.format("redirect:/question/detail/%s",id);
+        return String.format("redirect:/project/detail/%s",id);
 
     }
 
@@ -140,9 +146,25 @@ public class ProjectController {
         UserDto userDto = getUserSession(request);
 
         this.projectService.like(projectDto, userDto);
-        return String.format("redirect:/question/detail/%s", id);
+        return String.format("redirect:/project/detail/%s", id);
 
     }
 
+    //프로젝트 신청
+    @GetMapping("/ppick/{id}")
+    public String projectApply(ProjectApplyForm projectApplyForm) {
+        return "projectApplyForm";
+    }
+
+    @PostMapping("/ppick/{id}")
+    public String projectApply(@PathVariable("id") Integer id, @Valid ProjectApplyForm projectApplyForm, BindingResult bindingResult, HttpServletRequest request) {
+        ProjectDto projectDto = this.projectService.getProject(id);
+        UserDto userDto = getUserSession(request);
+        if(bindingResult.hasErrors()) {
+            return "project_form";
+        }
+        projectService.apply(projectDto, userDto, projectApplyForm);
+        return String.format("redirect:/project/detail/%s", id);
+    }
 
 }

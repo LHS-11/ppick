@@ -1,5 +1,6 @@
 package com.warrenverr.ppick.form;
 
+import com.warrenverr.ppick.model.Recruit;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,7 +43,14 @@ public class ProjectForm {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate projectEndDate;
-    
 
+    @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
+    private List<String> mainTask;
+
+    @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
+    private List<String> subTask;
+
+    @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
+    private List<Integer> recruitment;
 
 }

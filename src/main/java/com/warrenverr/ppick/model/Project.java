@@ -18,6 +18,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Project {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -60,9 +61,17 @@ public class Project {
     private List<Long> likes;
 
     @ManyToOne
-    @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project", cascade = CascadeType.REMOVE ,orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<Comment> commentList;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    private Recruit recruit;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ProjectApply> applyList;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<User> projectMember;
 }

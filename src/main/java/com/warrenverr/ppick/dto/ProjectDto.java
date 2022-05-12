@@ -26,4 +26,7 @@ public class ProjectDto {
     private List<Long> likes;
     private UserDto author;
     private List<CommentDto> commentList;
+    private RecruitDto recruit;
+    private List<ProjectApplyDto> applyList;
+    private List<UserDto> projectMember;
 }

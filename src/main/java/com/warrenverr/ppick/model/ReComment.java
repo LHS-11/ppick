@@ -23,7 +23,6 @@ public class ReComment {
     private User author;
 
     @ManyToOne
-    @JoinColumn(name = "COMMENT_ID")
     private Comment comment;
 
     @Column(columnDefinition = "TEXT")

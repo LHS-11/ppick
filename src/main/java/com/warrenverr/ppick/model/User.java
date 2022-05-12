@@ -21,7 +21,7 @@ public class User {
     private Long id;
 
     @Column(length = 255, unique = true, nullable = false)
-    private String sns_id;
+    private String snsid;
 
     @Column(length = 255, unique = true, nullable = false)
     private String email;
@@ -41,14 +41,18 @@ public class User {
     @Column(length = 30, nullable = false)
     private String detail_category;
 
+    @Column(length = 255)
+    private String image;
+
     @CreatedDate
     private LocalDateTime date;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
     private String agree;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-
+    @ElementCollection
+    private List<String> portfolio;
 }

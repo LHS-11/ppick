@@ -1,9 +1,13 @@
 package com.warrenverr.ppick.controller;
 
 import com.warrenverr.ppick.DataNotFoundException;
+import com.warrenverr.ppick.GoogleAPI.GoogleAPI;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
+import com.warrenverr.ppick.dto.ProjectApplyDto;
+import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.UserCreateForm;
+import com.warrenverr.ppick.service.ProjectService;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +31,20 @@ import java.util.HashMap;
 @ResponseBody
 public class UserController {
 
-    private String sns_id;
+    private String snsid;
     private String email;
     private String nickname;
 
     private final UserService userService;
+
+    private final ProjectService projectService;
+
+    public UserDto getUserSession(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        UserDto userDto = (UserDto) session.getAttribute("userInfo");
+
+        return userDto;
+    }
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
@@ -50,8 +63,9 @@ public class UserController {
             return dto;
         }
         try {
-            userCreateForm.setSns_id(sns_id);
+            userCreateForm.setSnsid(snsid);
             userCreateForm.setEmail(email);
+            //구글 로그인은 nickname을 안받아오므로 구글에서는 ""칸 주입
             userCreateForm.setNickname(nickname);
             dto = userService.signup(userCreateForm);
         }catch(DataIntegrityViolationException e) {
@@ -66,11 +80,51 @@ public class UserController {
         return dto;
     }
 
-    @RequestMapping("/login")
+
+    @RequestMapping("/Google_login")
+    public UserDto GoogleLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
+        UserDto userDto = null;
+        GoogleAPI googleAPI = new GoogleAPI();
+        System.out.println("Google code = " + code);
+        String access_Token = googleAPI.getAccessToken(code);
+
+        System.out.println("Access_Token : " + access_Token);
+        HashMap<String, Object> googleInfo = googleAPI.getUserInfo(access_Token);
+
+        HttpSession session = request.getSession();
+        String email = googleInfo.get("email").toString();
+        String snsid = googleInfo.get("sns_id").toString();
+        String nickname = "";
+        try {
+            userDto = this.userService.loginBySnsid(snsid);
+        }catch(DataNotFoundException e1) {
+            System.out.println("이게 나오면 첫 구글 로그인 성공");
+            try {
+                setSnsid(snsid);
+                setEmail(email);
+                setNickname(nickname);
+            }catch(DataIntegrityViolationException e2) {
+                e2.printStackTrace();
+                bindingResult.reject("signupFailed", "이미 등록된 사용자 입니다.");
+                return userDto;
+            }catch(Exception e3) {
+                e3.printStackTrace();
+                bindingResult.reject("signupFailed", e3.getMessage());
+                return userDto;
+            }
+        }
+
+        session.setAttribute("userInfo", userDto);
+        model.addAttribute("userInfo", userDto);
+        return userDto;
+    }
+
+
+    @RequestMapping("/Kakao_login")
     public UserDto login(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
         UserDto userDto = null;
         KakaoAPI kakaoAPI = new KakaoAPI();
-        System.out.println("code = " + code);
+        System.out.println("Kakao code = " + code);
         String access_Token = kakaoAPI.getAccessTocken(code);
 
         System.out.println("Access_Token : " + access_Token);
@@ -79,15 +133,15 @@ public class UserController {
 
         HttpSession session = request.getSession();
         String email = kakaoInfo.get("email").toString();
-        String sns_id = kakaoInfo.get("sns_id").toString();
+        String snsid = kakaoInfo.get("sns_id").toString();
         String nickname = kakaoInfo.get("nickName").toString();
 
         try {
-            userDto = this.userService.loginByEmail(email);
+            userDto = this.userService.loginBySnsid(snsid);
         }catch(DataNotFoundException e1) {
             System.out.println("이게 나오면 첫 카카오 로그인 성공");
             try {
-                setSns_id(sns_id);
+                setSnsid(snsid);
                 setNickname(nickname);
                 setEmail(email);
                 //회원가입 폼으로 이동 해주기  현재 그냥 임의값 넣었음
@@ -107,10 +161,19 @@ public class UserController {
         model.addAttribute("userInfo", userDto);
         return userDto;
     }
-
+/*
     @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
-        UserDto userDto = this.userService.loginByEmail("ktykty0722@naver.com");
+        UserDto userDto = this.userService.loginBySnsId("dbswl@naver.com");
+        HttpSession session = request.getSession();
+        session.setAttribute("userInfo", userDto);
+        return userDto;
+    }*/
+
+
+    @RequestMapping("/JustLogin")
+    public UserDto JustLogin(@ModelAttribute("sns_id") String sns_id, HttpServletRequest request,Model model) {
+        UserDto userDto = this.userService.loginBySnsid(sns_id);
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;
@@ -131,7 +194,7 @@ public class UserController {
 
         if(bindingResult.hasErrors())
             return "usermodi_form";
-        userCreateForm.setSns_id(userDto.getSns_id());
+        userCreateForm.setSnsid(userDto.getSnsid());
         userCreateForm.setEmail(userDto.getEmail());
         userCreateForm.setNickname(userDto.getNickname());
         this.userService.modify(userDto, userCreateForm);
@@ -154,5 +217,13 @@ public class UserController {
         return "mainPage";
     }
 
+    @PostMapping("/approve/{id}")
+    public String projectApprove(@PathVariable("id") Integer id, HttpServletRequest request) {
+        Integer projectId = Integer.valueOf(request.getParameter("projectId"));
+        ProjectDto projectDto = this.projectService.getProject(projectId);
+        UserDto userDto = getUserSession(request);
+        this.userService.approve(projectDto, id);
+        return String.format("redirect:/project/detail/%s", id);
+    }
 
 }

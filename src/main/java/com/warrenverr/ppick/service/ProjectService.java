@@ -1,11 +1,15 @@
 package com.warrenverr.ppick.service;
 
 import com.warrenverr.ppick.DataNotFoundException;
+import com.warrenverr.ppick.dto.ProjectApplyDto;
 import com.warrenverr.ppick.dto.ProjectDto;
+import com.warrenverr.ppick.dto.RecruitDto;
 import com.warrenverr.ppick.dto.UserDto;
+import com.warrenverr.ppick.form.ProjectApplyForm;
 import com.warrenverr.ppick.form.ProjectForm;
 import com.warrenverr.ppick.model.Project;
-
+import com.warrenverr.ppick.model.ProjectApply;
+import com.warrenverr.ppick.model.Recruit;
 import com.warrenverr.ppick.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,31 +35,37 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
+    private final RecruitService recruitService;
+
+    private final ProjectApplyService projectApplyService;
+
     private  final ModelMapper modelMapper;
 
     private ProjectDto of(Project project) { return modelMapper.map(project, ProjectDto.class); }
-
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
-
+    private ProjectDto of(ProjectForm projectForm) { return modelMapper.map(projectForm, ProjectDto.class); }
+    private RecruitDto of(Recruit recruit) { return modelMapper.map(recruit, RecruitDto.class); }
+    private ProjectApplyDto of(ProjectApply projectApply) { return modelMapper.map(projectApply, ProjectApplyDto.class); }
     //프로젝트 생성
+    @Transactional
     public ProjectDto create(ProjectForm projectForm, UserDto userDto) {
         ProjectDto projectDto = new ProjectDto();
-        projectDto.setTitle(projectForm.getTitle());
-        projectDto.setType(projectForm.getType());
-        projectDto.setExport(projectForm.getExport());
-        projectDto.setSkill(projectForm.getSkill());
-        projectDto.setArea(projectForm.getArea());
-        projectDto.setContent(projectForm.getContent());
-        projectDto.setImage(projectForm.getImage());
-        projectDto.setProjectStartDate(projectForm.getProjectStartDate());
-        projectDto.setProjectEndDate(projectForm.getProjectEndDate());
+        RecruitDto recruitDto = new RecruitDto();
+        recruitDto.setMainTask(projectForm.getMainTask());
+        recruitDto.setSubTask(projectForm.getSubTask());
+        recruitDto.setRecruitment(projectForm.getRecruitment());
+        Recruit recruit = recruitService.create(recruitDto);
+
+        projectDto = of(projectForm);
         projectDto.setAuthor(userDto);
+        projectDto.setRecruit(of(recruit));
         Project project = of(projectDto);
         this.projectRepository.save(project);
+
         return projectDto;
     }
 
-    //프로젝트 조회회
+    //프로젝트 조회
    @Transactional
     public ProjectDto getProject(Integer id) {
         Optional<Project> project = this.projectRepository.findById(id);
@@ -79,6 +89,13 @@ public class ProjectService {
 
     //프로젝트 수정
     public ProjectDto modify(ProjectDto projectDto, ProjectForm modifyProject) {
+        RecruitDto recruitDto = projectDto.getRecruit();
+        recruitDto.setMainTask(modifyProject.getMainTask());
+        recruitDto.setSubTask(modifyProject.getSubTask());
+        recruitDto.setRecruitment(modifyProject.getRecruitment());
+        Recruit recruit = recruitService.modify(recruitDto);
+
+
         projectDto.setTitle(modifyProject.getTitle());
         projectDto.setType(modifyProject.getType());
         projectDto.setExport(modifyProject.getExport());
@@ -88,8 +105,10 @@ public class ProjectService {
         projectDto.setImage(modifyProject.getImage());
         projectDto.setProjectStartDate(modifyProject.getProjectStartDate());
         projectDto.setProjectEndDate(modifyProject.getProjectEndDate());
+        projectDto.setRecruit(of(recruit));
         Project project = of(projectDto);
         this.projectRepository.save(project);
+
         return projectDto;
     }
 
@@ -118,5 +137,21 @@ public class ProjectService {
             projectDto.getLikes().add(userDto.getId());
         this.projectRepository.save(of(projectDto));
         return projectDto;
+    }
+
+    //프로젝트 지원
+    public void apply(ProjectDto projectDto, UserDto userDto, ProjectApplyForm projectApplyForm) {
+        ProjectApplyDto projectApplyDto = new ProjectApplyDto();
+        projectApplyDto.setField(projectApplyForm.getField());
+        projectApplyDto.setMotive(projectApplyForm.getMotive());
+        projectApplyDto.setUserDto(userDto);
+
+        ProjectApply projectApply = this.projectApplyService.create(projectApplyDto);
+
+        List<ProjectApplyDto> projectApplyDtoList = projectDto.getApplyList();
+        projectApplyDtoList.add(of(projectApply));
+        projectDto.setApplyList(projectApplyDtoList);
+        this.projectRepository.save(of(projectDto));
+
     }
 }
