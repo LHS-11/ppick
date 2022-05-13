@@ -1,6 +1,7 @@
 package com.warrenverr.ppick.controller;
 
 import com.warrenverr.ppick.DataNotFoundException;
+import com.warrenverr.ppick.GitHubAPI.GitHubAPI;
 import com.warrenverr.ppick.GoogleAPI.GoogleAPI;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
 import com.warrenverr.ppick.dto.ProjectApplyDto;
@@ -81,8 +82,38 @@ public class UserController {
     }
 
     @RequestMapping("/GitHub_login")
-    public String GitHubLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
-        return "github";
+    public UserDto GitHubLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
+        UserDto userDto = null;
+        GitHubAPI githubAPI = new GitHubAPI();
+        String access_Token = githubAPI.getAccessTocken(code);
+        HashMap<String, Object> githubInfo = githubAPI.getUserInfo(access_Token);
+        HttpSession session = request.getSession();
+        String email = githubInfo.get("email").toString();
+        String snsid = githubInfo.get("sns_id").toString();
+        String nickname = githubInfo.get("nickname").toString();
+
+        try {
+            userDto = this.userService.loginBySnsid(snsid);
+        }catch(DataNotFoundException e1) {
+            System.out.println("이게 나오면 첫 깃허브 로그인 성공");
+            try {
+                setSnsid(snsid);
+                setEmail(email);
+                setNickname(nickname);
+            }catch(DataIntegrityViolationException e2) {
+                e2.printStackTrace();
+                bindingResult.reject("signupFailed", "이미 등록된 사용자 입니다.");
+                return userDto;
+            }catch(Exception e3) {
+                e3.printStackTrace();
+                bindingResult.reject("signupFailed", e3.getMessage());
+                return userDto;
+            }
+        }
+
+        session.setAttribute("userInfo", userDto);
+        model.addAttribute("userInfo", userDto);
+        return userDto;
     }
 
 
