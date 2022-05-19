@@ -76,7 +76,7 @@ public class CommentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.commentService.modify(commentDto, commentForm);
-        return String.format("redirect:/project/detail/%s",commentDto.getProject().getId());
+        return String.format("redirect:/project/detail/%s",commentDto.getId());
     }
 
     //댓글 삭제
@@ -90,6 +90,6 @@ public class CommentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
         }
         this.commentService.delete(commentDto);
-        return String.format("redirect:/project/detail/%s",commentDto.getProject().getId());
+        return String.format("redirect:/project/detail/%s",commentDto.getId());
     }
 }

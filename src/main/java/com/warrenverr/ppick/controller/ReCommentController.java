@@ -51,7 +51,7 @@ public class ReCommentController {
         }
 
         this.reCommentService.create(commentDto,recommentForm.getContent(), userDto);
-        return String.format("redirect:/project/detail/%s",commentDto.getProject().getId());
+        return String.format("redirect:/project/detail/%s",commentDto.getId());
     }
 
     //대댓글 수정
@@ -80,7 +80,7 @@ public class ReCommentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
         this.reCommentService.modify(reCommentDto, recommentForm.getContent());
-        return String.format("redirect:/project/detail/%s", reCommentDto.getComment().getProject().getId());
+        return String.format("redirect:/project/detail/%s", reCommentDto.getId());
     }
 
     //대댓글 삭제
@@ -94,6 +94,6 @@ public class ReCommentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
         }
         this.reCommentService.delete(reCommentDto);
-        return String.format("redirect:/project/detail/%s", reCommentDto.getComment().getProject().getId());
+        return String.format("redirect:/project/detail/%s", reCommentDto.getId());
     }
 }

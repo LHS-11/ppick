@@ -79,13 +79,14 @@ public class ProjectService {
     @Transactional
     public Page<ProjectDto> getList(int page, String keyword) {
         List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createDate"));
-        Pageable pageable = PageRequest.of(page,10, Sort.by(sorts));
+        sorts.add(Sort.Order.asc("createDate"));
+        Pageable pageable = PageRequest.of(page,8, Sort.by(sorts));
         Specification<Project> specification = search(keyword);
         Page<Project> projectList = this.projectRepository.findAll(specification, pageable);
         Page<ProjectDto> projectDtoList = projectList.map(project -> of(project));
         return projectDtoList;
     }
+
 
     //프로젝트 수정
     public ProjectDto modify(ProjectDto projectDto, ProjectForm modifyProject) {
