@@ -1,13 +1,7 @@
 package com.warrenverr.ppick;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.warrenverr.ppick.dto.ProjectDto;
-import com.warrenverr.ppick.dto.UserDto;
-import com.warrenverr.ppick.form.ProjectForm;
-import com.warrenverr.ppick.form.UserCreateForm;
-import com.warrenverr.ppick.model.Project;
-import com.warrenverr.ppick.model.User;
+import com.warrenverr.ppick.email.GoogleEmailService;
+import com.warrenverr.ppick.email.NaverEmailService;
 import com.warrenverr.ppick.repository.ProjectRepository;
 import com.warrenverr.ppick.repository.UserRepository;
 import com.warrenverr.ppick.service.ProjectService;
@@ -15,12 +9,7 @@ import com.warrenverr.ppick.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.ui.Model;
-
-import java.util.List;
-import java.util.Optional;
 
 @WebAppConfiguration
 @SpringBootTest
@@ -37,6 +26,21 @@ class PpickApplicationTests {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private NaverEmailService naverEmailService;
+
+	@Autowired
+	private GoogleEmailService googleEmailService;
+	@Test
+	void 네이버이메일_테스트(){
+		naverEmailService.sendNaverEmail("ghktjq1118@naver.com");
+	}
+
+	@Test
+	void 구글이메일_테스트(){
+		googleEmailService.sendMail("ghktjq1119@naver.com");
+	}
 
 	/*
 	@Test
