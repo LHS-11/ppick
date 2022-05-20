@@ -4,20 +4,31 @@ import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.GitHubAPI.GitHubAPI;
 import com.warrenverr.ppick.GoogleAPI.GoogleAPI;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
-import com.warrenverr.ppick.dto.ProjectApplyDto;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.UserCreateForm;
+import com.warrenverr.ppick.jwt.JwtResponse;
+import com.warrenverr.ppick.jwt.JwtTokenUtil;
+import com.warrenverr.ppick.jwt.JwtUserDetailsService;
 import com.warrenverr.ppick.service.ProjectService;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -35,6 +46,15 @@ public class UserController {
     private String snsid;
     private String email;
     private String nickname;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
 
     private final UserService userService;
 
@@ -82,7 +102,8 @@ public class UserController {
     }
 
     @RequestMapping("/GitHub_login")
-    public UserDto GitHubLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
+    public ResponseEntity<?> GitHubLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
+        String token = null;
         UserDto userDto = null;
         GitHubAPI githubAPI = new GitHubAPI();
         String access_Token = githubAPI.getAccessTocken(code);
@@ -94,7 +115,13 @@ public class UserController {
 
         try {
             userDto = this.userService.loginBySnsid(snsid);
-        }catch(DataNotFoundException e1) {
+
+            authenticate(snsid, "password");
+
+            final UserDetails userDetails = userDetailsService
+                    .loadUserByUsername(snsid);
+            token = jwtTokenUtil.generateToken(userDetails,userDto);
+        } catch(DataNotFoundException e1) {
             System.out.println("이게 나오면 첫 깃허브 로그인 성공");
             try {
                 setSnsid(snsid);
@@ -103,17 +130,15 @@ public class UserController {
             }catch(DataIntegrityViolationException e2) {
                 e2.printStackTrace();
                 bindingResult.reject("signupFailed", "이미 등록된 사용자 입니다.");
-                return userDto;
             }catch(Exception e3) {
                 e3.printStackTrace();
                 bindingResult.reject("signupFailed", e3.getMessage());
-                return userDto;
             }
+        }catch(Exception e) {
+            e.printStackTrace();;
         }
 
-        session.setAttribute("userInfo", userDto);
-        model.addAttribute("userInfo", userDto);
-        return userDto;
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
 
@@ -173,6 +198,7 @@ public class UserController {
         String snsid = kakaoInfo.get("sns_id").toString();
         String nickname = kakaoInfo.get("nickName").toString();
 
+
         try {
             userDto = this.userService.loginBySnsid(snsid);
         }catch(DataNotFoundException e1) {
@@ -181,6 +207,7 @@ public class UserController {
                 setSnsid(snsid);
                 setNickname(nickname);
                 setEmail(email);
+
                 //회원가입 폼으로 이동 해주기  현재 그냥 임의값 넣었음
                 //signup(userCreateForm);
             }catch(DataIntegrityViolationException e2) {
@@ -195,9 +222,28 @@ public class UserController {
         }
 
         session.setAttribute("userInfo", userDto);
-        model.addAttribute("userInfo", userDto);
         return userDto;
     }
+    @RequestMapping("/image")
+    public void uploadImage(HttpServletRequest request, MultipartFile multi,  UserCreateForm userCreateForm) {
+        //String imageName = userCreateForm.getImage();
+        //String imagePath = request.getContextPath().toString();
+        //String path = "C:\\ppick_image";
+        //System.out.println("sss : " + multi.getOriginalFilename());
+        //File fileSabe = new File(path, imageName);
+
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
+        }
+    }
+
 /*
     @RequestMapping("/HardCoding_kakaoLogin_getSession")
     public UserDto emailTest(HttpServletRequest request,Model model) {
@@ -205,6 +251,23 @@ public class UserController {
         HttpSession session = request.getSession();
         session.setAttribute("userInfo", userDto);
         return userDto;
+    }*/
+
+    /*@RequestMapping(
+            value = "/login",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> login(final HttpServletRequest req, final HttpServletResponse res, @Valid @RequestBody Token.Request request) throws Exception {
+        UserDto userDto = this.userService.loginBySnsid(request.getId());
+        Authentication authentication = new UserAuthentication(request.getId(), null, null);
+        String token = JwtTokenProvider.generateToken(authentication);
+
+
+
+        Token.Response response = Token.Response.builder().token(token).build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }*/
 
 

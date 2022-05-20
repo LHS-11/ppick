@@ -4,10 +4,14 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectApplyForm;
 import com.warrenverr.ppick.form.ProjectForm;
+import com.warrenverr.ppick.jwt.JwtTokenUtil;
 import com.warrenverr.ppick.model.Project;
 import com.warrenverr.ppick.service.ProjectService;
+import com.warrenverr.ppick.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -24,8 +29,12 @@ import javax.validation.Valid;
 @RequestMapping("/project")
 public class ProjectController {
 
+    private final UserService userService;
     private final ProjectService projectService;
     private final ModelMapper modelMapper;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     private ProjectForm of(ProjectDto projectDto) {
         return modelMapper.map(projectDto, ProjectForm.class);
@@ -40,6 +49,22 @@ public class ProjectController {
         UserDto userDto = (UserDto) session.getAttribute("userInfo");
 
         return userDto;
+    }
+
+    //Decode Token
+    public String decodeJWT(HttpServletRequest request) {
+        String snsid;
+        final String requestTokenHeader = request.getHeader("Authorization");
+        String jwtToken = requestTokenHeader.substring(7);
+        try {
+            snsid = jwtTokenUtil.getUsernameFromToken(jwtToken);
+            return snsid;
+        }  catch (IllegalArgumentException e) {
+            System.out.println("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT Token has expired");
+        }
+        return null;
     }
 
 
@@ -67,7 +92,10 @@ public class ProjectController {
             return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);
         }
 
-        UserDto userDto = getUserSession(request);
+
+        String snsid = decodeJWT(request);
+        UserDto userDto = this.userService.loginBySnsid(snsid);
+
 //        if (userDto == null) {
 //            return new ResponseEntity<>("FAIL", HttpStatus.UNAUTHORIZED);
 //        }
