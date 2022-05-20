@@ -30,12 +30,9 @@ public class Comment {
     private LocalDateTime modifyDate;
 
     @ManyToOne
-    private Project project;
-
-    @ManyToOne
     private User author;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "comment", cascade = CascadeType.REMOVE ,orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE ,orphanRemoval = true)
     private List<ReComment> reCommentList;
 
 }
