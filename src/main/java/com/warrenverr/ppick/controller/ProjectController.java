@@ -57,7 +57,7 @@ public class ProjectController {
         final String requestTokenHeader = request.getHeader("Authorization");
         String jwtToken = requestTokenHeader.substring(7);
         try {
-            snsid = jwtTokenUtil.getUsernameFromToken(jwtToken);
+            snsid = jwtTokenUtil.getSnsidFromToken(jwtToken);
             return snsid;
         }  catch (IllegalArgumentException e) {
             System.out.println("Unable to get JWT Token");

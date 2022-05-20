@@ -7,9 +7,7 @@ import com.warrenverr.ppick.Kakao.KakaoAPI;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.UserCreateForm;
-import com.warrenverr.ppick.jwt.JwtResponse;
 import com.warrenverr.ppick.jwt.JwtTokenUtil;
-import com.warrenverr.ppick.jwt.JwtUserDetailsService;
 import com.warrenverr.ppick.service.ProjectService;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
@@ -23,7 +21,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -52,9 +49,6 @@ public class UserController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private JwtUserDetailsService userDetailsService;
 
     private final UserService userService;
 
@@ -101,26 +95,20 @@ public class UserController {
         return dto;
     }
 
-    @RequestMapping("/GitHub_login")
+    @RequestMapping("/auth/GitHub_login")
     public ResponseEntity<?> GitHubLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
         String token = null;
         UserDto userDto = null;
         GitHubAPI githubAPI = new GitHubAPI();
         String access_Token = githubAPI.getAccessTocken(code);
         HashMap<String, Object> githubInfo = githubAPI.getUserInfo(access_Token);
-        HttpSession session = request.getSession();
         String email = githubInfo.get("email").toString();
         String snsid = githubInfo.get("sns_id").toString();
         String nickname = githubInfo.get("nickname").toString();
 
         try {
             userDto = this.userService.loginBySnsid(snsid);
-
-            authenticate(snsid, "password");
-
-            final UserDetails userDetails = userDetailsService
-                    .loadUserByUsername(snsid);
-            token = jwtTokenUtil.generateToken(userDetails,userDto);
+            token = jwtTokenUtil.generateToken(snsid);
         } catch(DataNotFoundException e1) {
             System.out.println("이게 나오면 첫 깃허브 로그인 성공");
             try {
@@ -138,12 +126,12 @@ public class UserController {
             e.printStackTrace();;
         }
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        return new ResponseEntity<>(token, HttpStatus.OK);
     }
 
 
 
-    @RequestMapping("/Google_login")
+    @RequestMapping("/auth/Google_login")
     public UserDto GoogleLogin(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
         UserDto userDto = null;
         GoogleAPI googleAPI = new GoogleAPI();
@@ -182,7 +170,7 @@ public class UserController {
     }
 
 
-    @RequestMapping("/Kakao_login")
+    @RequestMapping("/auth/Kakao_login")
     public UserDto login(@ModelAttribute("code") String code, HttpServletRequest request, UserCreateForm userCreateForm, Model model, BindingResult bindingResult) {
         UserDto userDto = null;
         KakaoAPI kakaoAPI = new KakaoAPI();

@@ -52,7 +52,7 @@ public class GoogleAPI {
             sb.append("&client_secret=" + clientSecret);
             sb.append("&code=" + authorize_code);
             sb.append("&grant_type=authorization_code");
-            sb.append("&redirect_uri=http://localhost:8080/user/Google_login");
+            sb.append("&redirect_uri=http://localhost:8080/user/auth/Google_login");
             bw.write(sb.toString());
             bw.flush();
 
