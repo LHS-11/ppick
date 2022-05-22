@@ -3,9 +3,11 @@ package com.warrenverr.ppick.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class CrawlingDto {
+public class ContestDto {
 
     private String title;
     private String img;
@@ -16,5 +18,7 @@ public class CrawlingDto {
     private String reward;
     private String content;
     private String link;
+    private LocalDateTime createDate;
+
 
 }

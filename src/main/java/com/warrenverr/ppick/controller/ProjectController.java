@@ -45,7 +45,6 @@ public class ProjectController {
 
     //프로젝트 전체 리스트
     @GetMapping("/list")
-
     public ResponseEntity<?> list(@RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "keyword", defaultValue = "") String keyword) {
 

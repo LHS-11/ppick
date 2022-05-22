@@ -3,13 +3,15 @@ package com.warrenverr.ppick.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-public class Crawling {
+public class Contest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +26,9 @@ public class Crawling {
     private String apply_date;
 
     private String field;
+
+//    @CreatedDate
+    private LocalDateTime createDate;
 
     private String condition;
 
