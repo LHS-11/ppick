@@ -1,3 +1,4 @@
+/*
 package com.warrenverr.ppick.jwt;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,4 +42,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().headers().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 .and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
-}
+}*/

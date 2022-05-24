@@ -15,20 +15,13 @@ import com.warrenverr.ppick.repository.ProjectRepository;
 import com.warrenverr.ppick.repository.RecruitRepository;
 import com.warrenverr.ppick.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -130,7 +123,10 @@ public class UserService {
 
         this.projectRepository.save(of(projectDto));
 
-
     }
-
+    public List<UserDto> findAllUser() {
+        List<User> userList = userRepository.findAll();
+        List<UserDto> userDtoList = userList.stream().map(p -> modelMapper.map(p, UserDto.class)).collect(Collectors.toList());
+        return userDtoList;
+    }
 }

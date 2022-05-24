@@ -1,3 +1,4 @@
+/*
 package com.warrenverr.ppick.jwt;
 
 import java.io.IOException;
@@ -21,4 +22,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
 
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
-}
+}*/

@@ -14,6 +14,7 @@ package com.warrenverr.ppick.service;
 
         import java.time.LocalDateTime;
         import java.util.List;
+        import java.util.Objects;
         import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -58,15 +59,32 @@ public class ReCommentService {
     }
 
     //대댓글 수정
-    public ReCommentDto modify(ReCommentDto reCommentDto,String content){
+    public ReCommentDto modify(CommentDto commentDto, ReCommentDto reCommentDto,String content){
         reCommentDto.setContent(content);
         reCommentDto.setModifyDate(LocalDateTime.now());
-        reCommentRepository.save(of(reCommentDto));
-        return reCommentDto;
+        ReComment reComment = this.reCommentRepository.save(of(reCommentDto));
+
+        List<ReCommentDto> reCommentDtoList = commentDto.getReCommentList();
+        for (int i=0; i<reCommentDtoList.size();i++) {
+            if(Objects.equals(reCommentDtoList.get(i).getId(), reCommentDto.getId())) {
+                reCommentDtoList.set(i,of(reComment));
+            }
+        }
+        commentDto.setReCommentList(reCommentDtoList);
+        this.commentRepository.save(of(commentDto));
+        return of(reComment);
     }
 
     //대댓글 삭제
-    public void delete(ReCommentDto reCommentDto){
-        reCommentRepository.delete(of(reCommentDto));
+    public void delete(CommentDto commentDto,ReCommentDto reCommentDto){
+        List<ReCommentDto> reCommentDtoList = commentDto.getReCommentList();
+        for (int i=0; i<reCommentDtoList.size();i++) {
+            if(Objects.equals(reCommentDtoList.get(i).getId(), reCommentDto.getId())) {
+                reCommentDtoList.remove(i);
+            }
+        }
+        commentDto.setReCommentList(reCommentDtoList);
+        this.commentRepository.save(of(commentDto));
+        this.reCommentRepository.delete(of(reCommentDto));
     }
 }

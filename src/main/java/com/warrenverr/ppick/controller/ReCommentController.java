@@ -8,13 +8,11 @@ import com.warrenverr.ppick.service.CommentService;
 import com.warrenverr.ppick.service.ReCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +20,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
-@Controller
-@RequestMapping("/recomment")
+@RestController
+@RequestMapping("/api/recomment")
 public class ReCommentController {
 
     private final CommentService commentService;
@@ -41,59 +39,59 @@ public class ReCommentController {
     //대댓글 작성
     //이때 id는 project id
     @PostMapping("/write/{id}")
-    public String recommentCreate(Model model, @Valid ReCommentForm recommentForm, @PathVariable("id") Integer id,
+    public ResponseEntity<?> recommentCreate(Model model, @Valid @RequestBody ReCommentForm recommentForm, @PathVariable("id") Integer id,
                                 HttpServletRequest request, BindingResult bindingResult) {
         UserDto userDto = getUserSession(request);
         CommentDto commentDto = commentService.getComment(id);
         if(bindingResult.hasErrors()) {
-            model.addAttribute("recomment", commentDto);
-            return "recomment_detail";
+            return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);
         }
 
         this.reCommentService.create(commentDto,recommentForm.getContent(), userDto);
-        return String.format("redirect:/project/detail/%s",commentDto.getId());
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
     //대댓글 수정
     @GetMapping("/modify/{id}")
-    public String recommentModify(ReCommentForm recommentForm, @PathVariable("id") Integer id, HttpServletRequest request) {
+    public ResponseEntity<?> recommentModify(@PathVariable("id") Integer id, HttpServletRequest request) {
         ReCommentDto reCommentDto = reCommentService.getReComment(id);
         UserDto userDto = getUserSession(request);
-        if(!reCommentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
-        }
-
-        recommentForm.setContent(reCommentDto.getContent());
-        return "recomment_form";
+//        if(!reCommentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
+//        }
+        ReCommentForm reCommentForm = new ReCommentForm();
+        reCommentForm.setContent(reCommentDto.getContent());
+        return new ResponseEntity<>(reCommentForm, HttpStatus.OK);
     }
 
-    @PostMapping("/modify/{id}")
-    public String recommentModify(@Valid ReCommentForm recommentForm, BindingResult bindingResult,
-                                @PathVariable("id") Integer id, HttpServletRequest request) {
+    @PutMapping("/modify/{id}")
+    public ResponseEntity<?> recommentModify(@Valid @RequestBody ReCommentForm recommentForm, BindingResult bindingResult,
+                                @PathVariable("id") Integer id, @RequestParam(value = "commentId") Integer commentId, HttpServletRequest request) {
         if(bindingResult.hasErrors()) {
-            return "recomment_form";
+            return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);
         }
-
+        CommentDto commentDto = commentService.getComment(commentId);
         ReCommentDto reCommentDto = reCommentService.getReComment(id);
         UserDto userDto = getUserSession(request);
-        if(!reCommentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
-        }
-        this.reCommentService.modify(reCommentDto, recommentForm.getContent());
-        return String.format("redirect:/project/detail/%s", reCommentDto.getId());
+//        if(!reCommentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
+//        }
+        this.reCommentService.modify(commentDto,reCommentDto, recommentForm.getContent());
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
     //대댓글 삭제
-    @GetMapping("/delete/{id}")
-    public String commentDelete(@PathVariable("id") Integer id, HttpServletRequest request) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> commentDelete(@PathVariable("id") Integer id, @RequestParam(value = "commentId") Integer commentId, HttpServletRequest request) {
 
+        CommentDto commentDto = commentService.getComment(commentId);
         ReCommentDto reCommentDto = reCommentService.getReComment(id);
         UserDto userDto = getUserSession(request);
 
-        if(!reCommentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
-        }
-        this.reCommentService.delete(reCommentDto);
-        return String.format("redirect:/project/detail/%s", reCommentDto.getId());
+//        if(!reCommentDto.getAuthor().getEmail().equals(userDto.getEmail())) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
+//        }
+        this.reCommentService.delete(commentDto, reCommentDto);
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 }

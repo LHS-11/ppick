@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -30,7 +31,6 @@ public class CommentService {
     private Comment of(CommentDto commentDto) { return modelMapper.map(commentDto, Comment.class); }
     private Project of(ProjectDto projectDto) { return modelMapper.map(projectDto, Project.class); }
 
-    @Transactional
     public CommentDto getComment(Integer id) {
         Optional<Comment> comment = this.commentRepository.findById(id);
         if(comment.isPresent())
@@ -54,17 +54,35 @@ public class CommentService {
     }
 
     //댓글 수정
-    public CommentDto modify(CommentDto commentDto, CommentForm commentForm) {
+    public CommentDto modify(ProjectDto projectDto,CommentDto commentDto, CommentForm commentForm) {
         commentDto.setContent(commentForm.getContent());
         commentDto.setModifyDate(LocalDateTime.now());
-        Comment comment = of(commentDto);
-        this.commentRepository.save(comment);
-        return commentDto;
+        Comment comment = this.commentRepository.save(of(commentDto));
+
+        List<CommentDto> commentDtoList = projectDto.getCommentList();
+        for(int i=0;i<commentDtoList.size();i++) {
+            if(Objects.equals(commentDtoList.get(i).getId(), commentDto.getId())) {
+                commentDtoList.set(i,of(comment));
+            }
+        }
+        projectDto.setCommentList(commentDtoList);
+        this.projectRepository.save(of(projectDto));
+        return of(comment);
     }
 
     //댓글 삭제
-    public void delete(CommentDto commentDto) {
+    public void delete(ProjectDto projectDto, CommentDto commentDto) {
+        List<CommentDto> commentDtoList = projectDto.getCommentList();
+        for(int i=0;i<commentDtoList.size();i++) {
+            if(Objects.equals(commentDtoList.get(i).getId(), commentDto.getId())) {
+                commentDtoList.remove(i);
+            }
+        }
+        projectDto.setCommentList(commentDtoList);
+        this.projectRepository.save(of(projectDto));
+
         this.commentRepository.delete(of(commentDto));
+
     }
 
 }

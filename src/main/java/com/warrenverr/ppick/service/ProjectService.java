@@ -21,13 +21,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -59,15 +57,12 @@ public class ProjectService {
         projectDto = of(projectForm);
         projectDto.setAuthor(userDto);
         projectDto.setRecruit(of(recruit));
-        Project project = of(projectDto);
-        this.projectRepository.save(project);
-
-        return projectDto;
+        Project project = this.projectRepository.save(of(projectDto));
+        return of(project);
     }
 
     //프로젝트 조회
-   @Transactional
-    public ProjectDto getProject(Integer id) {
+    public ProjectDto getProjectByPid(Integer id) {
         Optional<Project> project = this.projectRepository.findById(id);
         if(project.isPresent()) {
             return of(project.get());
@@ -76,8 +71,7 @@ public class ProjectService {
         }
     }
 
-    @Transactional
-    public Page<ProjectDto> getList(int page, String keyword) {
+    public Page<ProjectDto> getListByPageAndKeyword(int page, String keyword) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.asc("createDate"));
         Pageable pageable = PageRequest.of(page,8, Sort.by(sorts));
@@ -86,6 +80,12 @@ public class ProjectService {
         Page<ProjectDto> projectDtoList = projectList.map(project -> of(project));
         return projectDtoList;
     }
+
+    public List<ProjectDto> getListBySkill(String skill) {
+        List<Project> projectList = projectRepository.findAllBySkill(skill);
+        return projectList.stream().map(p -> modelMapper.map(p, ProjectDto.class)).collect(Collectors.toList());
+    }
+
 
 
     //프로젝트 수정
@@ -136,8 +136,8 @@ public class ProjectService {
             projectDto.getLikes().remove(userDto.getId());
         else
             projectDto.getLikes().add(userDto.getId());
-        this.projectRepository.save(of(projectDto));
-        return projectDto;
+        Project project = this.projectRepository.save(of(projectDto));
+        return of(project);
     }
 
     //프로젝트 지원
