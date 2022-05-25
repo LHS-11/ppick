@@ -22,7 +22,7 @@ public class Crawling {
 
     private final ContestService contestService;
 
-    @EventListener(ContextRefreshedEvent.class)
+//    @EventListener(ContextRefreshedEvent.class)
     public void CrawlingLogic() throws IOException {
 
         // 공모분야가 IT인 페이지의 수를 측정하기 위해 처음 페이지
