@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class ContestDto {
 
+    private Integer id;
     private String title;
     private String img;
     private String host;
