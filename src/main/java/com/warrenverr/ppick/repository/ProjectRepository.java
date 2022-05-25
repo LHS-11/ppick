@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+import java.util.List;
+
 
 public interface ProjectRepository extends JpaRepository<Project, Integer> {
 
@@ -18,4 +20,6 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
     @Query(value = "SELECT p FROM Project p JOIN p.skill ps where ps = :skill")
     List<Project> findAllBySkill(@Param("skill") String skill);
 
+
+    Page<Project> findByContest(Integer contest_id, Pageable pageable);
 }

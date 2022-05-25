@@ -89,6 +89,17 @@ public class ProjectService {
 
 
     //프로젝트 수정
+    public Specification<Project> search(String keyword) {
+        return new Specification<Project>() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public Predicate toPredicate(Root<Project> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                return criteriaBuilder.or(criteriaBuilder.like(root.get("title"), "%" + keyword + "%"),
+                        criteriaBuilder.like(root.get("content"), "%" + keyword + "%"));
+            }
+        };
+    }
     public ProjectDto modify(ProjectDto projectDto, ProjectForm modifyProject) {
         RecruitDto recruitDto = projectDto.getRecruit();
         recruitDto.setMainTask(modifyProject.getMainTask());
@@ -118,17 +129,6 @@ public class ProjectService {
         this.projectRepository.delete(of(projectDto));
     }
 
-    public Specification<Project> search(String keyword) {
-        return new Specification<Project>() {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public Predicate toPredicate(Root<Project> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                query.distinct(true);
-                return criteriaBuilder.or(criteriaBuilder.like(root.get("title"), "%" + keyword + "%"),
-                        criteriaBuilder.like(root.get("content"), "%" + keyword + "%"));
-            }
-        };
-    }
 
     //프로젝트 좋아요
     public ProjectDto like(ProjectDto projectDto, UserDto userDto) {

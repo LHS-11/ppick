@@ -29,4 +29,6 @@ public class ProjectDto {
     private RecruitDto recruit;
     private List<ProjectApplyDto> applyList;
     private List<UserDto> projectMember;
+    private Integer contest;
+
 }
