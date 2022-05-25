@@ -1,9 +1,7 @@
 package com.warrenverr.ppick.service;
 
-import com.warrenverr.ppick.DataNotFoundException;
 import com.warrenverr.ppick.dto.ContestDto;
 import com.warrenverr.ppick.dto.ProjectDto;
-import com.warrenverr.ppick.form.ContestListForm;
 import com.warrenverr.ppick.model.Contest;
 import com.warrenverr.ppick.model.Project;
 import com.warrenverr.ppick.repository.ContestRepository;
@@ -24,6 +22,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -49,19 +48,30 @@ public class ContestService {
 
     //공모전 전체 리스트 및 키워드 서치
 //    @Transactional
-    public Page<ContestDto> getList(int page, String keyword) {
+    public Page<ContestDto> getListPaging(int page, String keyword) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(page,8, Sort.by(sorts));
-        Specification<Contest> specification = search(keyword);
+        Specification<Contest> specification = searchPaging(keyword);
         Page<Contest> contestList = this.contestRepository.findAll(specification, pageable);
         Page<ContestDto> contestDtoList = contestList.map(contest -> of(contest));
         return contestDtoList;
     }
 
+    @Transactional
+    public List<ContestDto> getList(String keyword){
+        List<Contest> contestList = new ArrayList<>();
+        if(keyword==""){
+            contestList = contestRepository.findAll();
+        }else{
+            contestList = contestRepository.findByTitleContains(keyword);
+        }
+        List<ContestDto> contestDtoList = contestList.stream().map(contest -> of(contest)).collect(Collectors.toList());
+        return contestDtoList;
+    }
 
-    //프로젝트 수정
-    public Specification<Contest> search(String keyword) {
+    //공모전 서치
+    public Specification<Contest> searchPaging(String keyword) {
         return new Specification<Contest>() {
             private static final long serialVersionUID = 1L;
             @Override
@@ -73,8 +83,13 @@ public class ContestService {
         };
     }
 
+    public List<Contest> search(String keyword){
+        List<Contest> contestList = this.contestRepository.findByTitleContains(keyword);
+        return contestList;
+    }
+
     //공모전 상세 페이지
-//    @Transactional
+    @Transactional
     public ContestDto getContest(Integer id) {
         return of(contestRepository.findById(id).get());
     }
@@ -93,5 +108,6 @@ public class ContestService {
         Page<ProjectDto> projectDtoList = projectList.map(project -> of(project));
         return projectDtoList;
     }
+
 
 }
