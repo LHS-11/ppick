@@ -22,9 +22,6 @@ public class ReComment {
     @ManyToOne
     private User author;
 
-    @ManyToOne
-    private Comment comment;
-
     @Column(columnDefinition = "TEXT")
     private String content;
 

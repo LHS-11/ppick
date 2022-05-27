@@ -53,4 +53,6 @@ public class ProjectForm {
     @NotEmpty(message = "프로젝트 모집 인원은 필수항목입니다.")
     private List<Integer> recruitment;
 
+    private Integer contest;
+
 }

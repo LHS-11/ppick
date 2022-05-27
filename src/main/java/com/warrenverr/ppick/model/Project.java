@@ -18,7 +18,6 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Project {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -43,6 +42,9 @@ public class Project {
 
     @Column(length = 255)
     private String image;
+
+    @ColumnDefault("1")
+    private Integer contest;
 
     private LocalDate projectStartDate;
 

@@ -1,11 +1,9 @@
-package com.warrenverr.ppick.Kakao;
-
+package com.warrenverr.ppick.GitHubAPI;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -14,37 +12,32 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
-public class KakaoAPI {
-
+public class GitHubAPI {
 
     public String getAccessTocken(String authorize_code) {
+        String reqURL = "https://github.com/login/oauth/access_token";
         String access_Token = "";
-        String refresh_Token = "";
-        String reqURL = "https://kauth.kakao.com/oauth/token";
-
         try {
             URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 
-            //POST 요청을 위해 기본값이 false인 setDoOutput을 true로
+            conn.setRequestProperty("Accept", "application/json");
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
 
-            //POST 요청에 필요로 요구하는 파라미터 스트림을 통해 전송
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
-            sb.append("grant_type=authorization_code");
-            sb.append("&client_id=355ccd66392dd483c58a75147c6dbf5a");
-            sb.append("&redirect_uri=http://localhost:8080/user/auth/Kakao_login");
+            sb.append("client_id=Iv1.e91f1c5595cd0b04");
+            sb.append("&client_secret=26e6cb7503ec8aa813bbf3d2013b4307c4d458f1");
+            sb.append("&redirect_uri=http://localhost:8080/user/auth/GitHub_login");
             sb.append("&code=" + authorize_code);
+            sb.append("&state=state");
             bw.write(sb.toString());
             bw.flush();
 
-            // 코드가 200이라면 성공
             int responseCode = conn.getResponseCode();
             System.out.println("responseCode : " + responseCode);
 
-            // 요청에 의한 JSON 타입 response 메시지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
             String result = "";
@@ -60,10 +53,8 @@ public class KakaoAPI {
             JsonElement element = parser.parse(result);
 
             access_Token = element.getAsJsonObject().get("access_token").getAsString();
-            refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
 
             System.out.println("access_token : " + access_Token);
-            System.out.println("refresh_token : " + refresh_Token);
 
         }catch(Exception e) {
             e.printStackTrace();
@@ -74,13 +65,11 @@ public class KakaoAPI {
 
     public HashMap<String, Object> getUserInfo(String access_Token) {
         HashMap<String, Object> userInfo = new HashMap<>();
-        String reqURL = "https://kapi.kakao.com/v2/user/me";
+        String reqUrl = "https://api.github.com/user";
 
         try {
-            URL url = new URL(reqURL);
+            URL url = new URL(reqUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-
             conn.setRequestProperty("Authorization", "Bearer " + access_Token);
 
             int responseCode = conn.getResponseCode();
@@ -99,17 +88,21 @@ public class KakaoAPI {
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(result);
 
-            JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
-            JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
-
             String sns_id = element.getAsJsonObject().get("id").getAsString();
-            String nickname = properties.getAsJsonObject().get("nickname").getAsString();
-            String email= kakao_account.getAsJsonObject().get("email").getAsString();
-            System.out.println("sns_id = " + sns_id);
-            System.out.println("nickname = " + nickname);
-            System.out.println("email = " + email);
+            String nickname = element.getAsJsonObject().get("login").getAsString();
+            String email = null;
+            try {
+                 email = element.getAsJsonObject().get("email").getAsString();
+            }catch (UnsupportedOperationException e) {
+                email = "";
+            }
+
+            System.out.println("sns_id : " + sns_id);
+            System.out.println("nickname : " + nickname);
+            System.out.println("email : " + email);
+
             userInfo.put("sns_id", sns_id);
-            userInfo.put("nickName", nickname);
+            userInfo.put("nickname", nickname);
             userInfo.put("email", email);
 
         }catch(Exception e) {
@@ -118,4 +111,5 @@ public class KakaoAPI {
 
         return userInfo;
     }
+
 }

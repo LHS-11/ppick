@@ -4,13 +4,15 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ProjectApplyForm;
 import com.warrenverr.ppick.form.ProjectForm;
-import com.warrenverr.ppick.model.ProjectApply;
+import com.warrenverr.ppick.model.Project;
 import com.warrenverr.ppick.service.ProjectService;
+import com.warrenverr.ppick.service.UserService;
+/*import io.jsonwebtoken.ExpiredJwtException;*/
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,14 +20,27 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 
 @RequiredArgsConstructor
-@Controller
-@RequestMapping("/project")
-@ResponseBody
+@RestController
+@RequestMapping("/api/project")
 public class ProjectController {
 
+    private final UserService userService;
     private final ProjectService projectService;
+    private final ModelMapper modelMapper;
+
+    /*@Autowired
+    private JwtTokenUtil jwtTokenUtil;*/
+
+    private ProjectForm of(ProjectDto projectDto) {
+        return modelMapper.map(projectDto, ProjectForm.class);
+    }
+
+    private ProjectDto of(Project project) {
+        return modelMapper.map(project, ProjectDto.class);
+    }
 
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -34,137 +49,148 @@ public class ProjectController {
         return userDto;
     }
 
+    //Decode Token
+    /*public String decodeJWT(HttpServletRequest request) {
+        String snsid;
+        final String requestTokenHeader = request.getHeader("Authorization");
+        String jwtToken = requestTokenHeader.substring(7);
+        try {
+            snsid = jwtTokenUtil.getSnsidFromToken(jwtToken);
+            return snsid;
+        }  catch (IllegalArgumentException e) {
+            System.out.println("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT Token has expired");
+        }
+        return null;
+    }*/
+
+
     //프로젝트 전체 리스트
-    @RequestMapping("/list")
-    public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
-                       @RequestParam(value = "keyword", defaultValue = "") String keyword) {
+    @GetMapping("/list")
+    public ResponseEntity<?> listByPageAndKeyword(@RequestParam(value = "limit", defaultValue = "0") int limit,
+                                  @RequestParam(value = "keyword", defaultValue = "") String keyword) {
 
-        Page<ProjectDto> paging = this.projectService.getList(page, keyword);
-        model.addAttribute("paging", paging);
-        model.addAttribute("keyword", keyword);
-        return "project_list";
-
+        Page<ProjectDto> paging = this.projectService.getListByPageAndKeyword(limit, keyword);
+        return new ResponseEntity<>(paging.getContent(), HttpStatus.OK);
     }
+
+    @GetMapping("/listBySkill")
+    public ResponseEntity<?> listBySkill(@RequestParam(value = "skill") String skill) {
+        List<ProjectDto>  projectDtoList = this.projectService.getListBySkill(skill);
+        return new ResponseEntity<>(projectDtoList, HttpStatus.OK);
+    }
+
+
 
     //프로젝트 상세 보기
-    @RequestMapping(value = "/detail/{id}")
-    public ProjectDto detail(Model model, @PathVariable("id") Integer id) {
-
-        ProjectDto projectDto = this.projectService.getProject(id);
-        model.addAttribute("project",projectDto);
-
-        return projectDto;
-
+    @GetMapping(value = "/detail/{id}")
+    public ResponseEntity<?> detail(@PathVariable("id") Integer id) {
+        ProjectDto projectDto = this.projectService.getProjectByPid(id);
+        return new ResponseEntity<>(projectDto, HttpStatus.OK);
     }
 
-    //프로젝트 작성
-    @GetMapping("/write")
-    public String projectCreate(ProjectForm projectForm) {
-        return "project_form";
-    }
 
     @PostMapping("/write")
-    public String projectCreate(ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
-            return "project_form";
+    public ResponseEntity<?> projectCreate(@Valid @RequestBody ProjectForm projectForm, HttpServletRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);
         }
-        UserDto userDto = getUserSession(request);
+
+
+        /*String snsid = "ㄴㅅ"*//*decodeJWT(request)*//*;
+        UserDto userDto = this.userService.loginBySnsid(snsid);*/
+        UserDto userDto = this.userService.findUserById(1L);
+//        if (userDto == null) {
+//            return new ResponseEntity<>("FAIL", HttpStatus.UNAUTHORIZED);
+//        }
         this.projectService.create(projectForm, userDto);
 
-        return "redirect:/project/list";
-
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
     //프로젝트 수정
     @GetMapping("/modify/{id}")
-    public String projectModify(ProjectForm projectForm, @PathVariable("id") Integer id, HttpServletRequest request) {
+    public ResponseEntity<?> projectModify(@PathVariable("id") Integer id, HttpServletRequest request) {
 
-        ProjectDto projectDto = this.projectService.getProject(id);
+        ProjectDto projectDto = this.projectService.getProjectByPid(id);
         UserDto userDto = getUserSession(request);
-
-        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
-        }
-
-
-        projectForm.setTitle(projectDto.getTitle());
-        projectForm.setType(projectDto.getType());
-        projectForm.setExport(projectDto.getExport());
-        projectForm.setSkill(projectDto.getSkill());
-        projectForm.setArea(projectDto.getArea());
-        projectForm.setContent(projectDto.getContent());
-        projectForm.setImage(projectDto.getImage());
-        projectForm.setProjectStartDate(projectDto.getProjectStartDate());
-        projectForm.setProjectEndDate(projectDto.getProjectEndDate());
+        ProjectForm projectForm;
+        projectForm = of(projectDto);
         projectForm.setMainTask(projectDto.getRecruit().getMainTask());
         projectForm.setSubTask(projectDto.getRecruit().getSubTask());
         projectForm.setRecruitment(projectDto.getRecruit().getRecruitment());
 
-        return "project_form";
-
+        return new ResponseEntity<>(projectForm, HttpStatus.OK);
     }
 
-    @PostMapping("/modify/{id}")
-    public String projectModify(@Valid ProjectForm projectForm, BindingResult bindingResult,
-                                @PathVariable("id") Integer id, HttpServletRequest request) {
+    @PutMapping("/modify/{id}")
+    public ResponseEntity<?> projectModify(@Valid @RequestBody ProjectForm projectForm, BindingResult bindingResult,
+                                                @PathVariable("id") Integer id, HttpServletRequest request) {
 
         UserDto userDto = getUserSession(request);
-        ProjectDto projectDto = this.projectService.getProject(id);
+        ProjectDto projectDto = this.projectService.getProjectByPid(id);
 
-        if(bindingResult.hasErrors()) {
-            return "project_form";
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);
+
         }
 
-        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
-        }
+//        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
+//            return new ResponseEntity<>("FAIL",HttpStatus.FORBIDDEN);
+//        }
+
         this.projectService.modify(projectDto, projectForm);
-        return String.format("redirect:/project/detail/%s",id);
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 
     }
 
     //프로젝트 삭제
-    @GetMapping("/delete/{id}")
-    public String projectDelete(@PathVariable("id") Integer id, HttpServletRequest request) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> projectDelete(@PathVariable("id") Integer id, HttpServletRequest request) {
 
-        ProjectDto projectDto = this.projectService.getProject(id);
+        ProjectDto projectDto = this.projectService.getProjectByPid(id);
         UserDto userDto = getUserSession(request);
 
-        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
-        }
+//        if(!projectDto.getAuthor().getEmail().equals(userDto.getEmail())) {
+//            return new ResponseEntity<>("FAIL",HttpStatus.FORBIDDEN);
+//        }
+
         this.projectService.delete(projectDto);
-        return "redirect:/";
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
 
     //프로젝트 추천 누르기
     @GetMapping("/like/{id}")
-    public String projectLike(@PathVariable("id") Integer id, HttpServletRequest request) {
+    public ResponseEntity<?> projectLike(@PathVariable("id") Integer id, HttpServletRequest request) {
 
-        ProjectDto projectDto = this.projectService.getProject(id);
+        ProjectDto projectDto = this.projectService.getProjectByPid(id);
         UserDto userDto = getUserSession(request);
 
-        this.projectService.like(projectDto, userDto);
-        return String.format("redirect:/project/detail/%s", id);
+//        if (userDto == null) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "좋아요 권한이 없습니다.");
+//        }
 
+        projectDto = this.projectService.like(projectDto, userDto);
+        return new ResponseEntity<>(projectDto, HttpStatus.OK);
     }
 
     //프로젝트 신청
-    @GetMapping("/ppick/{id}")
-    public String projectApply(ProjectApplyForm projectApplyForm) {
-        return "projectApplyForm";
-    }
-
     @PostMapping("/ppick/{id}")
-    public String projectApply(@PathVariable("id") Integer id, @Valid ProjectApplyForm projectApplyForm, BindingResult bindingResult, HttpServletRequest request) {
-        ProjectDto projectDto = this.projectService.getProject(id);
-        UserDto userDto = getUserSession(request);
-        if(bindingResult.hasErrors()) {
+    public ResponseEntity<?> projectApply(@PathVariable("id") Integer id, @Valid @RequestBody ProjectApplyForm projectApplyForm, BindingResult bindingResult, HttpServletRequest request) {
+        ProjectDto projectDto = this.projectService.getProjectByPid(id);
+        UserDto userDto = this.userService.findUserById(1L);        /*if(bindingResult.hasErrors()) {
             return "project_form";
         }
+        List<ProjectApplyDto> projectApplyDtoList =  projectDto.getApplyList();
+        for(int i=0;i<projectApplyDtoList.size();i++) {
+            if(projectApplyDtoList.get(i).getUserDto().getEmail().equals(userDto.getEmail())){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 신청");
+            }
+        }*/
         projectService.apply(projectDto, userDto, projectApplyForm);
-        return String.format("redirect:/project/detail/%s", id);
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
 }

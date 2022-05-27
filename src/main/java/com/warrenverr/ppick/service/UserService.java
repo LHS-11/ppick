@@ -17,9 +17,11 @@ import com.warrenverr.ppick.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -58,6 +60,20 @@ public class UserService {
         }
     }
 
+    public User loginSnsid(String snsid) {
+        Optional<User> user = this.userRepository.findBySnsid(snsid);
+        if(user.isPresent()) {
+            return user.get();
+        }else {
+            throw new DataNotFoundException("project not found");
+        }
+    }
+
+    public String storeImage(MultipartFile file) {
+
+
+        return "";
+    }
 
     /*public UserDto loginByEmail(String email) {
         Optional<User> user = this.userRepository.findByEmail(email);
@@ -107,6 +123,15 @@ public class UserService {
 
         this.projectRepository.save(of(projectDto));
 
+    }
+    public List<UserDto> findAllUser() {
+        List<User> userList = userRepository.findAll();
+        List<UserDto> userDtoList = userList.stream().map(p -> modelMapper.map(p, UserDto.class)).collect(Collectors.toList());
+        return userDtoList;
+    }
 
+    public UserDto findUserById(Long id) {
+        User user = userRepository.findById(id).get();
+        return of(user);
     }
 }

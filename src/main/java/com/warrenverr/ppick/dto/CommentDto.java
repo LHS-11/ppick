@@ -13,7 +13,6 @@ public class CommentDto {
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
-    private ProjectDto project;
     private UserDto author;
     private List<ReCommentDto> reCommentList;
 }
