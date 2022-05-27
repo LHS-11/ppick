@@ -6,6 +6,7 @@ import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.form.ReCommentForm;
 import com.warrenverr.ppick.service.CommentService;
 import com.warrenverr.ppick.service.ReCommentService;
+import com.warrenverr.ppick.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class ReCommentController {
     private final CommentService commentService;
 
     private final ReCommentService reCommentService;
-
+    private final UserService userService;
 
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -41,7 +42,7 @@ public class ReCommentController {
     @PostMapping("/write/{id}")
     public ResponseEntity<?> recommentCreate(Model model, @Valid @RequestBody ReCommentForm recommentForm, @PathVariable("id") Integer id,
                                 HttpServletRequest request, BindingResult bindingResult) {
-        UserDto userDto = getUserSession(request);
+        UserDto userDto = userService.findUserById(1L);
         CommentDto commentDto = commentService.getComment(id);
         if(bindingResult.hasErrors()) {
             return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);

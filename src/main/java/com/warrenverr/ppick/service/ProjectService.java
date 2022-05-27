@@ -71,14 +71,22 @@ public class ProjectService {
         }
     }
 
-    public Page<ProjectDto> getListByPageAndKeyword(int page, String keyword) {
+    public Page<ProjectDto> getListByPageAndKeyword(int limit, String keyword) {
+        if(limit==0)
+            limit=10;
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.asc("createDate"));
-        Pageable pageable = PageRequest.of(page,8, Sort.by(sorts));
+        Pageable pageable = PageRequest.of(0,limit, Sort.by(sorts));
         Specification<Project> specification = search(keyword);
         Page<Project> projectList = this.projectRepository.findAll(specification, pageable);
         Page<ProjectDto> projectDtoList = projectList.map(project -> of(project));
         return projectDtoList;
+    }
+
+    public List<ProjectDto> getListByKeyword(String keyword) {
+        Specification<Project> specification = search(keyword);
+        List<Project> projectList = this.projectRepository.findAll(specification);
+        return projectList.stream().map(p -> modelMapper.map(p, ProjectDto.class)).collect(Collectors.toList());
     }
 
     public List<ProjectDto> getListBySkill(String skill) {

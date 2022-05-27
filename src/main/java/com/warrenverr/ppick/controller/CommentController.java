@@ -7,6 +7,7 @@ import com.warrenverr.ppick.form.CommentForm;
 import com.warrenverr.ppick.model.Project;
 import com.warrenverr.ppick.service.CommentService;
 import com.warrenverr.ppick.service.ProjectService;
+import com.warrenverr.ppick.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class CommentController {
 
     private final ProjectService projectService;
     private final CommentService commentService;
+    private final UserService userService;
 
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -39,7 +41,7 @@ public class CommentController {
     @PostMapping("/write/{id}")
     public ResponseEntity<?> commentCreate(@PathVariable("id") Integer id, @Valid @RequestBody CommentForm commentForm,
                                         HttpServletRequest request, BindingResult bindingResult) {
-        UserDto userDto = getUserSession(request);
+        UserDto userDto = this.userService.findUserById(1L);
         ProjectDto projectDto = this.projectService.getProjectByPid(id);
         if(bindingResult.hasErrors()) {
             return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);

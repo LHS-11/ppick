@@ -68,10 +68,10 @@ public class ProjectController {
 
     //프로젝트 전체 리스트
     @GetMapping("/list")
-    public ResponseEntity<?> listByPageAndKeyword(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<?> listByPageAndKeyword(@RequestParam(value = "limit", defaultValue = "0") int limit,
                                   @RequestParam(value = "keyword", defaultValue = "") String keyword) {
 
-        Page<ProjectDto> paging = this.projectService.getListByPageAndKeyword(page, keyword);
+        Page<ProjectDto> paging = this.projectService.getListByPageAndKeyword(limit, keyword);
         return new ResponseEntity<>(paging.getContent(), HttpStatus.OK);
     }
 
@@ -100,7 +100,7 @@ public class ProjectController {
 
         /*String snsid = "ㄴㅅ"*//*decodeJWT(request)*//*;
         UserDto userDto = this.userService.loginBySnsid(snsid);*/
-        UserDto userDto = null;
+        UserDto userDto = this.userService.findUserById(1L);
 //        if (userDto == null) {
 //            return new ResponseEntity<>("FAIL", HttpStatus.UNAUTHORIZED);
 //        }
@@ -180,8 +180,7 @@ public class ProjectController {
     @PostMapping("/ppick/{id}")
     public ResponseEntity<?> projectApply(@PathVariable("id") Integer id, @Valid @RequestBody ProjectApplyForm projectApplyForm, BindingResult bindingResult, HttpServletRequest request) {
         ProjectDto projectDto = this.projectService.getProjectByPid(id);
-        UserDto userDto = getUserSession(request);
-        /*if(bindingResult.hasErrors()) {
+        UserDto userDto = this.userService.findUserById(1L);        /*if(bindingResult.hasErrors()) {
             return "project_form";
         }
         List<ProjectApplyDto> projectApplyDtoList =  projectDto.getApplyList();

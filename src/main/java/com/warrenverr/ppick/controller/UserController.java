@@ -6,6 +6,7 @@ import com.warrenverr.ppick.GoogleAPI.GoogleAPI;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
+import com.warrenverr.ppick.email.GoogleEmailService;
 import com.warrenverr.ppick.form.UserCreateForm;
 import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.service.ProjectService;
@@ -51,6 +52,8 @@ public class UserController {
 
     private final ProjectService projectService;
 
+    private final GoogleEmailService googleEmailService;
+
     public UserDto getUserSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
         UserDto userDto = (UserDto) session.getAttribute("userInfo");
@@ -64,7 +67,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public UserDto signup(UserCreateForm userCreateForm, BindingResult bindingResult) {
+    public UserDto signup(@RequestBody UserCreateForm userCreateForm, BindingResult bindingResult) {
         UserDto dto = null;
         if(bindingResult.hasErrors())
             return dto;
@@ -75,10 +78,10 @@ public class UserController {
             return dto;
         }
         try {
-            userCreateForm.setSnsid(snsid);
-            userCreateForm.setEmail(email);
-            //구글 로그인은 nickname을 안받아오므로 구글에서는 ""칸 주입
-            userCreateForm.setNickname(nickname);
+//            userCreateForm.setSnsid(snsid);
+//            userCreateForm.setEmail(email);
+//            //구글 로그인은 nickname을 안받아오므로 구글에서는 ""칸 주입
+//            userCreateForm.setNickname(nickname);
             dto = userService.signup(userCreateForm);
         }catch(DataIntegrityViolationException e) {
             e.printStackTrace();
@@ -319,5 +322,11 @@ public class UserController {
 
         List<UserDto> userList = userService.findAllUser();
         return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
+    @GetMapping("/ppick")
+    public ResponseEntity<?> userPpick() {
+        googleEmailService.sendMail("ktykty0722@naver.com");
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 }

@@ -129,4 +129,9 @@ public class UserService {
         List<UserDto> userDtoList = userList.stream().map(p -> modelMapper.map(p, UserDto.class)).collect(Collectors.toList());
         return userDtoList;
     }
+
+    public UserDto findUserById(Long id) {
+        User user = userRepository.findById(id).get();
+        return of(user);
+    }
 }

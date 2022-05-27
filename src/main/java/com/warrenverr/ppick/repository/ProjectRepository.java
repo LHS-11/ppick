@@ -17,6 +17,8 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
 
     Page<Project> findAll(Specification<Project> specification, Pageable pageable);
 
+    List<Project> findAll(Specification<Project> specification);
+
     @Query(value = "SELECT p FROM Project p JOIN p.skill ps where ps = :skill")
     List<Project> findAllBySkill(@Param("skill") String skill);
 
