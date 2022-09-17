@@ -1,6 +1,6 @@
 package com.warrenverr.ppick.service;
 
-import com.warrenverr.ppick.DataNotFoundException;
+import com.warrenverr.ppick.config.DataNotFoundException;
 import com.warrenverr.ppick.dto.CommentDto;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;

@@ -1,6 +1,6 @@
 package com.warrenverr.ppick.service;
 
-import com.warrenverr.ppick.DataNotFoundException;
+import com.warrenverr.ppick.config.DataNotFoundException;
 import com.warrenverr.ppick.dto.ProjectApplyDto;
 import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.RecruitDto;

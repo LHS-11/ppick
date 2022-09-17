@@ -1,4 +1,4 @@
-package com.warrenverr.ppick;
+package com.warrenverr.ppick.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

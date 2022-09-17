@@ -1,6 +1,6 @@
 package com.warrenverr.ppick.controller;
 
-import com.warrenverr.ppick.DataNotFoundException;
+import com.warrenverr.ppick.config.DataNotFoundException;
 import com.warrenverr.ppick.GitHubAPI.GitHubAPI;
 import com.warrenverr.ppick.GoogleAPI.GoogleAPI;
 import com.warrenverr.ppick.Kakao.KakaoAPI;
@@ -8,17 +8,14 @@ import com.warrenverr.ppick.dto.ProjectDto;
 import com.warrenverr.ppick.dto.UserDto;
 import com.warrenverr.ppick.email.GoogleEmailService;
 import com.warrenverr.ppick.form.UserCreateForm;
-import com.warrenverr.ppick.model.User;
 import com.warrenverr.ppick.service.ProjectService;
 import com.warrenverr.ppick.service.UserService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;

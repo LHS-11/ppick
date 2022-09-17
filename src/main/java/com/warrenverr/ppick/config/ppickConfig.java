@@ -1,4 +1,4 @@
-package com.warrenverr.ppick;
+package com.warrenverr.ppick.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

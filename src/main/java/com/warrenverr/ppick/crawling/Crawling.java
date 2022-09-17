@@ -22,7 +22,7 @@ public class Crawling {
 
     private final ContestService contestService;
 
-//    @EventListener(ContextRefreshedEvent.class)
+    @EventListener(ContextRefreshedEvent.class)
     public void CrawlingLogic() throws IOException {
 
         // 공모분야가 IT인 페이지의 수를 측정하기 위해 처음 페이지
@@ -37,7 +37,6 @@ public class Crawling {
             final String campuspickUrl = "https://allforyoung.com/posts/category/2/?contypes=14&page=" + j;
             Connection conn = Jsoup.connect(campuspickUrl);
 
-//            System.out.println("--------------------");
             try {
                 Document document = conn.get();
                 Elements imageUrlElements = document.select("div.poster__box > a > picture > img");
@@ -63,7 +62,6 @@ public class Crawling {
                         int cnt=0;
                         for(Element row: table.select("tr")){
                             Elements tds = row.select("td");
-//                            System.out.println(tds.get(0).text());
                             if(cnt==0) contestDto.setHost(tds.get(0).text());
                             else if(cnt==1) contestDto.setApply_date(tds.get(0).text());
                             else if(cnt==2) contestDto.setField(tds.get(0).text());
@@ -82,21 +80,14 @@ public class Crawling {
                     //신청하기 링크 (link)
                     String temp = applyLink.get(0).attr("abs:onclick");
                     if (temp.equals("")) {
-//                        System.out.println("No link");
                         continue;
                     }
                     String apply = temp.substring(temp.indexOf('\'') + 1, temp.lastIndexOf('\''));
-//                    System.out.println("신청 링크 : " + apply);
                     contestDto.setLink(apply);
 
                     String ad = contestDto.getApply_date();
 
-//                    System.out.println(ad.substring(15, 26));
-
                     contestDto.setCreateDate(LocalDateTime.now());
-//                    System.out.println("contestDto.getCreateDate() = " + contestDto.getCreateDate());
-                    // 이미지 (img)
-//                    System.out.println("포스팅 이미지 : " + imageUrlElements1.get(0).attr("abs:src"));
                     contestDto.setImg(imageUrlElements1.get(0).attr("abs:src"));
 
                     contestService.createCrawling(contestDto);
@@ -104,7 +95,6 @@ public class Crawling {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            System.out.println("—————————");
         }
     }
 }
