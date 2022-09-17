@@ -13,17 +13,23 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Component
 public class Crawling {
 
-
     private final ContestService contestService;
 
+    private final CrawlingConfig crawlingConfig;
+
     @EventListener(ContextRefreshedEvent.class)
-    public void CrawlingLogic() throws IOException {
+    public void CrawlingLogic() throws IOException, NoSuchAlgorithmException, KeyManagementException {
+
+
+        crawlingConfig.setSSL();
 
         // 공모분야가 IT인 페이지의 수를 측정하기 위해 처음 페이지
         final String camUrl = "https://allforyoung.com/posts/category/2/?contypes=14";
@@ -55,7 +61,6 @@ public class Crawling {
                     //제목 (title)
                     contestDto.setTitle(title.text());
 
-
                     // 주최측,지원기간,공모분야,자격요건,상금 크롤링 (host, apply_date,field,condition,reward)
                     Elements tables = innerDocument.select("div.detail_info > table");
                     for (Element table : tables) {
@@ -71,11 +76,9 @@ public class Crawling {
                         }
                     }
 
-
                     //상세 내용 (content)
                     Elements content = innerDocument.select("div.container > div.descriptionBox > p");
                     contestDto.setContent(content.html());
-
 
                     //신청하기 링크 (link)
                     String temp = applyLink.get(0).attr("abs:onclick");
